@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import app from "../firebase";
+import { useNavigate } from "react-router-dom";
+
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -14,7 +17,7 @@ export default function LoginForm() {
     try {
       const auth = getAuth(app);
       await signInWithEmailAndPassword(auth, email, password);
-      window.location.href = "/dashboard";
+      navigate("/dashboard");
     } catch (error) {
       setErr("❌ Wrong credentials or network error.");
     }
