@@ -4,7 +4,7 @@ export default function AdminPanel() {
     { name: "Instagram Followers (Non Drop)", price: 31 },
     { name: "Instagram Likes (1K)", price: 4 },
     { name: "Telegram Members (India)", price: 40 },
-    { name: "Instagram Reels Views", price: 0.25 },
+    { name: "Instagram Reels Views", price: 0.25 }
   ]);
   const [qr, setQr] = useState("");
   const handlePrice = (idx, val) => {
@@ -22,7 +22,7 @@ export default function AdminPanel() {
       ))}
       <h3>Change UPI QR (paste image URL):</h3>
       <input value={qr} onChange={e=>setQr(e.target.value)} placeholder="Paste QR URL" />
-      <h3>Panel Stats/Users/Deposits will be here (extend as you code backend)</h3>
+      <h3>Panel Stats/Users/Deposits (extend for full backend)</h3>
     </div>
   );
 }
