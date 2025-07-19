@@ -1,20 +1,55 @@
 import React, { useState } from "react";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import app from "../firebase";
 export default function LoginForm() {
-  const [email, setEmail] = useState(""), [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
-  const handleSubmit = e => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async e => {
     e.preventDefault();
-    if (!email || !password) setErr("Please enter both fields.");
-    // Connect to Firebase Auth here
+    setErr("");
+    setLoading(true);
+    try {
+      const auth = getAuth(app);
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = "/dashboard";
+    } catch (error) {
+      setErr("❌ Wrong credentials or network error.");
+    }
+    setLoading(false);
   };
+
   return (
-    <form className="login-form" onSubmit={handleSubmit}>
-      <h2>Sign In</h2>
-      {err && <div className="form-error">{err}</div>}
-      <input placeholder="📧 Email" value={email} onChange={e=>setEmail(e.target.value)} />
-      <input type="password" placeholder="🔑 Password" value={password} onChange={e=>setPassword(e.target.value)} />
-      <button className="btn-main">Sign In</button>
-      <div className="switch-link">New user? <a href="/signup">Sign up</a></div>
-    </form>
+    <>
+      <h2 className="login-title">Sign in to Your Account</h2>
+      <form className="login-form" onSubmit={handleSubmit}>
+        <input
+          type="email"
+          placeholder="📧 Email"
+          className="login-input"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="🔑 Password"
+          className="login-input"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
+        {err && <div className="form-error">{err}</div>}
+        <button className="login-btn-green" disabled={loading}>
+          {loading ? "Signing in..." : "Sign in"}
+        </button>
+      </form>
+      <div className="login-links">
+        <span>Do not have an account? <a href="/signup" className="signup-link">Sign up</a></span>
+        <a href="/forgot" className="forgot-link">Forgot Password?</a>
+      </div>
+    </>
   );
 }
