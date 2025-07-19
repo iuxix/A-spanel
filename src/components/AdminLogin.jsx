@@ -5,7 +5,7 @@ export default function AdminLogin({ onSuccess }) {
   const handleLogin = e => {
     e.preventDefault();
     if(user === "DebaxLucixFire" && pass === "Jaan") onSuccess();
-    else setErr("Invalid admin credentials.");
+    else setErr("❌ Invalid admin credentials.");
   };
   return (
     <form className="admin-login-form" onSubmit={handleLogin}>
@@ -13,7 +13,7 @@ export default function AdminLogin({ onSuccess }) {
       {err && <div className="form-error">{err}</div>}
       <input placeholder="Username" value={user} onChange={e=>setUser(e.target.value)} />
       <input type="password" placeholder="Password" value={pass} onChange={e=>setPass(e.target.value)} />
-      <button className="btn-main">Login</button>
+      <button className="btn-main" type="submit">Login</button>
     </form>
   );
 }
