@@ -4,7 +4,6 @@ import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase
 
 export default function AdminPanel() {
   const [services, setServices] = useState([]);
-  const [editing, setEditing] = useState(null); // {id, field, value}
   const [newItem, setNewItem] = useState({title:"",cat:"",desc:"",avgtime:"",min:"",max:"",price:""});
 
   useEffect(()=>{
