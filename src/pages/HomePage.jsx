@@ -6,8 +6,9 @@ export default function HomePage() {
     <div style={{
       background: "linear-gradient(112deg,#f2fff9 60%,#e5f5fa 100%)",
       minHeight: "100vh",
-      paddingBottom: 30
+      paddingBottom: 40
     }}>
+      {/* NAVBAR */}
       <nav style={{
         background: "#fff",
         borderBottom: "1px solid #f3f7fb",
@@ -16,150 +17,149 @@ export default function HomePage() {
         boxShadow: "0 1px 12px #c6eaff17",
         display: "flex", alignItems: "center", justifyContent: "space-between"
       }}>
-        <div style={{ fontWeight: 900, color: "#2ad881", fontSize: "2em", marginLeft: 22, letterSpacing: 1.2 }}>fastsmmpanel</div>
+        <div style={{ fontWeight: 900, color: "#29e9e2", fontSize: "2em", marginLeft: 22, letterSpacing: 1.2 }}>
+          LuciXFire Panel
+        </div>
         <div style={{marginRight:15}}>
           <Link to="/login" style={{
             background: "linear-gradient(90deg,#17deb0,#6ddcff)",
             color: "#fff", borderRadius: 19, fontWeight: 700, fontSize: "1.12em",
-            padding: "10px 30px", marginRight: 10, textDecoration: "none", boxShadow: "0 2px 6px #10f8ff12"
+            padding: "10px 30px", marginRight: 9, textDecoration: "none", boxShadow: "0 2px 6px #10f8ff12"
           }}>Sign In</Link>
           <Link to="/signup" style={{
             background: "linear-gradient(90deg,#fed700,#39fa7c 98%)",
             color: "#222", borderRadius: 19, fontWeight: 700, fontSize: "1.12em",
-            padding: "10px 30px", textDecoration: "none"
+            padding: "10px 30px", marginRight: 9, textDecoration: "none"
           }}>Sign Up</Link>
+          <Link to="/admin" style={{
+            background: "linear-gradient(90deg,#5e22ec 14%,#ffad05 97%)",
+            color: "#fff", borderRadius: 19, fontWeight: 700, fontSize: "1.12em",
+            padding: "10px 22px", textDecoration: "none"
+          }}>Admin Login</Link>
         </div>
       </nav>
 
-      {/* Hero/CTA Section */}
+      {/* HERO */}
       <div style={{
-        maxWidth: 1160, margin: "0 auto", display: "flex", flexWrap: "wrap", alignItems: "center", gap: 30, padding: "43px 6vw 22px 6vw"
+        maxWidth: 1160, margin: "0 auto", display: "flex", flexWrap: "wrap", alignItems: "center", gap: 30, padding: "46px 6vw 30px 6vw"
       }}>
         <div style={{ flex: "1 1 400px", minWidth: 270 }}>
-          <h1 style={{ fontSize: "2.3em", lineHeight: 1.14, fontWeight: 800, margin: "7px 0 19px", letterSpacing: -2 }}>
-            Boost Your Social Media Presence <span style={{ color: "#2ad881" }}>⚡</span>
+          <h1 style={{ fontSize: "2.3em", lineHeight: 1.14, fontWeight: 800, margin: "7px 0 22px", letterSpacing: -2 }}>
+            Boost Your Social Media Presence <span style={{ color: "#24e07c" }}>⚡</span> <br />
+            with LuciXFire Panel #1
           </h1>
-          <div style={{ fontSize: "1.18em", marginBottom: 23, color: "#1b3457", lineHeight: 1.63 }}>
-            The world’s fastest, <span style={{ color: "#14d117", fontWeight: 700 }}>affordable</span> SMM services.
-            <br />
-            <b>Automatic orders, wallet, analytics, and real-time refills</b> — for agencies, resellers, and brands.
+          <div style={{ fontSize: "1.16em", marginBottom: 21, color: "#1b2c67", lineHeight: 1.63 }}>
+            LuciXFire Panel is your one stop for rapid, affordable, all-in-one Social Media Marketing.<br />
+            <b>Wallet, instant stats, refill automation, and real-time admin approval — for resellers and brands.</b>
           </div>
-          <ul style={{ paddingLeft: 23, margin: "0 0 35px 0", color: "#172928" }}>
-            <li style={{ marginBottom: 8 }}>🌟 <b>10+ Categories:</b> IG, YouTube, Telegram, Facebook, &amp; more</li>
-            <li style={{ marginBottom: 8 }}>💸 <b>Wallet System:</b> UPI/crypto/top-up, instant order + refund</li>
-            <li style={{ marginBottom: 8 }}>🛡️ <b>100% Safe & Secure. Admin-monitored, live approval</b></li>
-            <li>💬 <b>24/7 WhatsApp API support</b></li>
+          <ul style={{ paddingLeft: 23, margin: "0 0 30px 0", color: "#172928" }}>
+            <li style={{ marginBottom: 8 }}>🌟 10+ Categories: Instagram, YouTube, Telegram &amp; more</li>
+            <li style={{ marginBottom: 8 }}>💸 Instant top-up and secure refund system</li>
+            <li style={{ marginBottom: 8 }}>🛡️ Admin-monitored, live support, zero downtime</li>
+            <li>💬 24/7 WhatsApp API support</li>
           </ul>
           <Link to="/signup" style={{
-            background: "linear-gradient(90deg,#feda4a,#23e860 90%)",
+            background: "linear-gradient(90deg,#feda4a,#18d381 90%)",
             color: "#093f14", borderRadius: 21, fontWeight: 900, fontSize: "1.17em",
-            padding: "13px 45px 13px 45px", textDecoration: "none",
-            letterSpacing: "1px", boxShadow: "0 2px 16px #2ad88518"
+            padding: "13px 45px", textDecoration: "none", letterSpacing: "1px", boxShadow: "0 2px 16px #2ad88518"
           }}>Create Free Account 🚀</Link>
         </div>
-        <div style={{ flex: "1 1 320px", display:"flex", justifyContent: "center" }}>
+        <div style={{
+          flex: "1 1 320px", display:"flex", justifyContent: "center",
+          paddingTop:12, minHeight:250
+        }}>
+          {/* Make sure the image exists in /public! */}
           <img
-            src="/rocket-hero.png"
-            style={{ maxWidth: "335px", width: "93vw", borderRadius: "49px", boxShadow: "0 7px 40px #1de1451b" }}
-            alt="rocket fastsmmpanel" />
+            src="/mobile-likes.png"
+            style={{ maxWidth: "300px", width: "93vw", borderRadius: "40px", boxShadow: "0 6px 34px #15ffbf14", background:"#fff" }}
+            alt="LuciXFire Panel Hero" />
         </div>
       </div>
 
-      {/* How it Works Section */}
-      <div style={{ background:"#fff", padding:"35px 0 25px 0", marginTop:33 }}>
-        <h2 style={{textAlign:"center", fontWeight:900, marginBottom:19, letterSpacing: -1}}>How It Works</h2>
+      {/* HOW IT WORKS */}
+      <div style={{ background:"#fff", padding:"37px 0 27px 0", marginTop:32 }}>
+        <h2 style={{textAlign:"center", fontWeight:900, marginBottom:25}}>How It Works</h2>
         <div style={{
-          maxWidth:1100, margin:"0 auto", display:"flex", flexWrap: "wrap", justifyContent:"space-around", gap:30
+          maxWidth:1100, margin:"0 auto", display:"flex", flexWrap: "wrap", justifyContent:"space-around", gap:33
         }}>
           {[
             {
-              title: "Create An Account & Add Balance",
-              icon: "👤",
-              desc: "Sign up and add balance via UPI or crypto. Secure wallet for instant orders and refunds."
+              title: "Create an Account & Add Balance",
+              icon: "📝",
+              desc: "Register, deposit minimum ₹100+ by UPI/QR, and get your wallet activated."
             },
             {
-              title: "Select Your Targeted Service",
-              icon: "💼",
-              desc: "Choose from wide range: Instagram, Telegram, YouTube, and more. Our real-time API keeps data fresh."
+              title: "Select Your Social Service",
+              icon: "🎯",
+              desc: "Browse, search & pick real followers, views or members for any social platform."
             },
             {
-              title: "Provide Link, Quantity & Watch Results!",
-              icon: "🔗",
-              desc: "Submit details and see progress live in your dashboard, track, refill, or refund instantly."
+              title: "Paste Details & Watch Results",
+              icon: "🚀",
+              desc: "Paste link, set quantity, submit order! Track & chat with admin live any time."
             }
           ].map((step, idx) =>
             <div key={idx} style={{
-              background: "#f8fefd",
+              background: "#f7fcff",
               borderRadius: 20,
-              boxShadow: "0 2px 16px #12efc218",
-              padding: "27px 35px", minWidth:220, maxWidth:340, flex:"1 1 250px", marginBottom:17
+              boxShadow: "0 2px 18px #91ffc418",
+              padding: "29px 30px",
+              minWidth: 220,
+              maxWidth: 340,
+              flex:"1 1 260px", marginBottom:19, textAlign:"center"
             }}>
-              <div style={{fontSize:"2.5em",marginBottom:14,textAlign:"center"}}>{step.icon}</div>
-              <div style={{fontWeight:700, fontSize:"1.18em", marginBottom:7, textAlign:"center"}}>{step.title}</div>
-              <div style={{color:"#207047",fontSize:"1em",textAlign:"center"}}>{step.desc}</div>
+              <div style={{fontSize:"2.4em",marginBottom:14}}>{step.icon}</div>
+              <div style={{fontWeight:700, fontSize:"1.16em", marginBottom:6}}>{step.title}</div>
+              <div style={{color:"#1f7d49",fontSize:"1em"}}>{step.desc}</div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Stats and CTA Bar */}
+      {/* SOCIAL HERO + STATS */}
       <div style={{
         display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center",
-        background: "#fff", maxWidth: 1100, margin: "40px auto 0", borderRadius: 20, boxShadow: "0 2px 9px #45ebae09"
+        background: "#fff", maxWidth: 1100, margin: "35px auto 0", borderRadius: 22, boxShadow: "0 2px 12px #1dfbe922"
       }}>
-        {[
-          { value: "726,724", label: "Total Orders", emoji: "🧾" },
-          { value: "$0.001/1K", label: "Starting Price", emoji: "💰" },
-          { value: "24/7", label: "Fastest Support", emoji: "💬" },
-          { value: "3058+", label: "Happy Clients", emoji: "🎉" }
-        ].map((stat, idx) =>
-          <div key={idx} style={{ padding: "33px 37px", fontSize: "1.13em", display: "flex", alignItems: "center" }}>
-            <span style={{ fontSize: "2em", marginRight: 15 }}>{stat.emoji}</span>
-            <span>
-              <b style={{ fontSize: "1.17em" }}>{stat.value}</b>
-              <br /><span style={{ color: "#0594e2", fontWeight: 600 }}>{stat.label}</span>
-            </span>
+        <img src="/rocket-hero.png"
+            alt="Smart SMM"
+            style={{width:110,margin:"35px 23px"}} />
+        <div>
+          <div style={{fontWeight:900,fontSize:"1.41em",margin:"12px 0 9px"}}>Best SMM Panel For Agencies & Resellers</div>
+          <div style={{color:"#1a4a59",fontSize:"1em",marginBottom:13}}>
+            LuciXFire helps agencies &amp; social media pros manage clients easier.<br/>
+            Fully automated, trusted by 3k+ Indian resellers.<br/>
+            <span style={{color:'#10db5b'}}>Try us now—just ₹100 deposit!</span>
           </div>
-        )}
+          <Link to="/dashboard"
+                style={{
+                  background:"linear-gradient(90deg,#23e156,#16ccfa 97%)",
+                  color:"#fff", fontWeight:800, borderRadius:19, fontSize:"1.07em",
+                  padding:"11px 38px", textDecoration:"none"
+                }}
+          >See Dashboard Examples</Link>
+        </div>
       </div>
 
-      {/* Services CTA with Large Icons */}
-      <div style={{maxWidth:1280,margin:"60px auto 45px",textAlign:"center"}}>
-        <h2 style={{fontWeight:900,letterSpacing: "-2px",fontSize:"2.16em",marginBottom:13}}>Top SMM Services We Provide</h2>
-        <div style={{ fontSize: "1.16em", color: "#1c314c", marginBottom: "17px" }}>
-          At <b>fastsmmpanel</b>, you get all services — IG, YouTube, Telegram, Facebook, LinkedIn, Twitter, Tiktok, Website & more.<br/>
-          <span style={{ color: "#09e37b" }}>Automated, refillable, and live-supported 24/7.</span>
+      {/* Large Feature Icons (bottom) */}
+      <div style={{maxWidth:1180,margin:"60px auto 35px",textAlign:"center",padding:"0 16px"}}>
+        <h2 style={{fontWeight:900,letterSpacing: "-2px",fontSize:"2.1em",marginBottom:15,marginTop:0}}>Why LuciXFire Panel?</h2>
+        <div style={{ fontSize: "1.14em", color: "#0d314c", marginBottom: "17px" }}>
+          Trusted by creators, agencies, and business owners for <b>platform reach, brand authenticity,</b> and <b>growth support</b>.<br/>
+          Fully refilled, fast support, bot-free, on mobile and desktop—try us free!
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 25, margin: "0", padding:"12px 0 0 0" }}>
-          {["instagram","facebook","youtube","telegram","twitter","tiktok","linkedin","discord","website"].map(net =>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 25, marginTop:18 }}>
+          {["Instagram","Facebook","YouTube","Telegram","Twitter","Tiktok","LinkedIn","Discord"].map((net, idx) =>
             <div key={net}
               style={{
-                width: 63, height: 63, borderRadius: 33, display: "flex", alignItems: "center", justifyContent: "center",
-                background: net === "instagram" ? "#ffe7f0"
-                  : net === "facebook" ? "#e7f4ff"
-                  : net === "youtube" ? "#fff3ee"
-                  : net === "telegram" ? "#eaf9ff"
-                  : net === "twitter" ? "#eaf8ff"
-                  : net === "linkedin" ? "#ececff"
-                  : net === "tiktok" ? "#ececec"
-                  : net === "website" ? "#e9ffe6" : "#f5f5fa",
-                margin: "3px"
+                width: 62, height: 62, borderRadius: 33, display: "flex", alignItems: "center", justifyContent: "center",
+                background: "#fff", margin: "3px", boxShadow: "0 0 9px #18b6ef11"
               }}>
-              <img src={`/social-icons/${net}.png`}
-                alt={net} style={{ width: 34, height: 34 }} />
+              <img src={`/social-icons/${net.toLowerCase()}.png`}
+                alt={net} style={{ width: 35, height: 35 }} />
             </div>
           )}
         </div>
-        <Link to="/dashboard"
-              style={{
-                marginTop: "24px", display:"inline-block",
-                background:"linear-gradient(90deg,#4cff81,#0ebbef 90%)",
-                color:"#fff", fontWeight:900, borderRadius:20, fontSize:"1.19em",
-                padding:"15px 68px", textDecoration:"none", boxShadow: "0 2px 9px #1cd2e840"
-              }}
-        >
-          View All Services &rarr;
-        </Link>
       </div>
     </div>
   );
