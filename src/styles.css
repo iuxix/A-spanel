@@ -98,4 +98,19 @@ input, select, textarea {
   .stats-cards{max-width:98vw;}
   .dashboard-bg{padding:0 2vw;}
   .order-sec-box{max-width:99vw;}
+  .main-btn {
+  padding:13px 38px;
+  border-radius:15px;
+  font-size:1.11em;
+  font-weight:700;
+  border:none;
+  box-shadow:0 2px 12px #5cfffb12;
+  transition: filter .11s, background .19s;
+  cursor:pointer;
+  text-decoration:none;display:inline-block;
+}
+.main-btn.green { background: linear-gradient(93deg,#34dcc0 10%,#4af9a5 98%); color: #fff; }
+.main-btn.yellow { background: linear-gradient(91deg,#ffbf30,#57e483 98%); color: #fff; }
+.main-btn.dark   { background: linear-gradient(92deg,#953fee,#145eae 100%); color: #fff; }
+.main-btn:hover  { filter: brightness(1.09);}
 }
