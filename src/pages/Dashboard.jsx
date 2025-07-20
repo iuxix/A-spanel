@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import OrderSection from "../components/OrderSection";
-import { FaUserCircle, FaCog, FaWallet, FaHistory, FaEllipsisV } from "react-icons/fa";
+import { FaUserCircle, FaEllipsisV, FaWallet, FaHistory, FaCog } from "react-icons/fa";
 import ProfileModal from "../components/ProfileModal";
 import SettingsModal from "../components/SettingsModal";
 import HistoryModal from "../components/HistoryModal";
@@ -28,7 +28,7 @@ export default function Dashboard() {
     <div className="dashboard-bg">
       <Navbar />
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",maxWidth:500,margin:"24px auto 0 auto",position:"relative"}}>
-        <h1 style={{fontSize:"1.35em"}}>My SMM Dashboard <span role="img" aria-label="panel">🌐</span></h1>
+        <h1 style={{fontSize:"1.3em"}}>My SMM Dashboard <span role="img" aria-label="panel">🌐</span></h1>
         <div style={{position:"relative"}}>
           <button className="menu-btn" onClick={()=>setMenuOpen(o=>!o)}><FaEllipsisV size={25} color="#aaa" /></button>
           {menuOpen && (
