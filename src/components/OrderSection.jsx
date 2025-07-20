@@ -1,51 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import { db } from "../firebase";
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  orderBy,
-} from "firebase/firestore";
-
-// Read-only demo; for real "orders", add a Firestore "orders" collection push!
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 
 export default function OrderSection() {
   const [categories, setCategories] = useState([]);
   const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [cat, setCat] = useState("");
   const [filtered, setFiltered] = useState([]);
   const [selected, setSelected] = useState(null);
   const [qty, setQty] = useState("");
   const [link, setLink] = useState("");
   const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  // Load categories/services from Firestore
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      // Fetch categories (assume collection "categories")
-      const catSnap = await getDocs(collection(db, "categories"));
-      const cats = catSnap.docs.map(doc => doc.data());
+      const catsSnap = await getDocs(collection(db, "categories"));
+      const cats = catsSnap.docs.map(doc => doc.data());
       setCategories(cats);
-      // Fetch services (collection "services", ordered)
-      const svSnap = await getDocs(query(collection(db, "services"), orderBy("cat")));
-      const svs = svSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setServices(svs);
-      setLoading(false);
-
-      // Default to first category if available
       if (cats.length > 0) setCat(cats[0].name);
+
+      const svcsSnap = await getDocs(query(collection(db, "services"), orderBy("cat")));
+      const svcs = svcsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setServices(svcs);
+      setLoading(false);
     }
     fetchData();
   }, []);
 
-  // When category changes, refresh filtered services
   useEffect(() => {
     setFiltered(services.filter(s => s.cat === cat));
-    setSelected(null); // Unselect service on category change
+    setSelected(null);
+    setQty("");
+    setLink("");
+    setMsg("");
   }, [cat, services]);
 
   function handleOrder(e) {
@@ -55,12 +45,9 @@ export default function OrderSection() {
       return;
     }
     if (parseInt(qty) < selected.min || parseInt(qty) > selected.max) {
-      setMsg(
-        `❌ Quantity: Min ${selected.min} - Max ${selected.max}`
-      );
+      setMsg(`❌ Quantity: Min ${selected.min} - Max ${selected.max}`);
       return;
     }
-    // For real: push to Firestore "orders" collection
     setMsg(`✅ Order placed for ${qty}: ${selected.title}`);
     setQty("");
     setLink("");
