@@ -1,4 +1,5 @@
 import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 const firebaseConfig = {
   apiKey: "AIzaSyD-sR7W8dSyD9jc4JD6B_z2xrE0QuDMmac",
   authDomain: "roxu-mods.firebaseapp.com",
@@ -9,4 +10,5 @@ const firebaseConfig = {
   appId: "1:1017801546966:android:419ee0d177dd0584befd77"
 };
 const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
 export default app;
