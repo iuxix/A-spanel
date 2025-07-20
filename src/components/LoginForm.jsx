@@ -1,58 +1,60 @@
 import React, { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import app from "../firebase";
-import { useNavigate } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
-  const handleSubmit = async e => {
+  async function handleSubmit(e) {
     e.preventDefault();
     setErr("");
     setLoading(true);
     try {
       const auth = getAuth(app);
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/dashboard");
-    } catch (error) {
-      setErr("❌ Wrong credentials or network error.");
+      window.location.href = "/dashboard";
+    } catch (e) {
+      setErr("❌ Incorrect email or password.");
     }
     setLoading(false);
-  };
+  }
 
   return (
-    <>
-      <h2 className="login-title">Sign in to Your Account</h2>
-      <form className="login-form" onSubmit={handleSubmit}>
+    <div>
+      <div className="login-title" style={{ fontSize: "1.3em", textAlign: "center" }}>
+        Sign In to <span style={{ color: "#07b9ef" }}>fastsmmpanel</span> <span role="img" aria-label="lock">🔒</span>
+      </div>
+      <form className="login-form" onSubmit={handleSubmit} autoComplete="off">
         <input
           type="email"
-          placeholder="📧 Email"
           className="login-input"
+          placeholder="📧 Email"
           value={email}
+          autoFocus
           onChange={e => setEmail(e.target.value)}
-          required
         />
         <input
           type="password"
-          placeholder="🔑 Password"
           className="login-input"
+          placeholder="🔑 Password"
           value={password}
           onChange={e => setPassword(e.target.value)}
-          required
         />
         {err && <div className="form-error">{err}</div>}
         <button className="login-btn-green" disabled={loading}>
-          {loading ? "Signing in..." : "Sign in"}
+          {loading ? "Signing in..." : "Sign In"}
         </button>
       </form>
-      <div className="login-links">
-        <span>Do not have an account? <a href="/signup" className="signup-link">Sign up</a></span>
-        <a href="/forgot" className="forgot-link">Forgot Password?</a>
+      <div className="login-links" style={{ marginTop: 16, textAlign: "center" }}>
+        <span>
+          Don’t have an account? <a href="/signup">Sign up</a>
+        </span>
+        <span> · <a href="/forgot" className="forgot-link">Forgot password?</a></span>
       </div>
-    </>
+    </div>
   );
 }
