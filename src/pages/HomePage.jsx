@@ -4,12 +4,14 @@ export default function HomePage() {
   return (
     <div className="lp-main">
       <div className="lp-content">
-        <div className="lp-title">Grow Faster with <span style={{color:'#0da4e1'}}>fastsmmpanel</span> 🚀</div>
-        <div className="lp-desc">
-          The #1 SMM panel.<br/>
-          Real followers, fast views, full analytics, secure wallet, instant orders.<br/>
-          <b style={{color:'#18a850'}}>Start now. Make your growth unstoppable!</b>
-        </div>
+        <div className="lp-title">Grow Your Socials with <span style={{color:'#1da4ed'}}>fastsmmpanel</span> 🚀</div>
+        <div className="lp-desc">India’s #1 SMM panel: get <b>guaranteed real growth</b> for Instagram, YouTube, Telegram, and all platforms. Pro wallet system, API-supported orders, and live analytics.</div>
+        <ul className="lp-feature-list">
+          <li>🔥 Lightning-fast delivery (10M/day!)</li>
+          <li>🛡️ 100% stable, refill guarantee, instant tracking</li>
+          <li>📈 Modern dashboard — stats, bonus offers, full order history</li>
+          <li>💬 24/7 WhatsApp support</li>
+        </ul>
         <div className="lp-btns">
           <Link to="/login" className="lp-btn signin">Sign In</Link>
           <Link to="/signup" className="lp-btn signup">Sign Up</Link>
@@ -17,7 +19,7 @@ export default function HomePage() {
         </div>
       </div>
       <div className="lp-imgbox">
-        <img src="/logo.png" className="lp-img" alt="Panel Logo" />
+        <img src="/logo.png" className="lp-img" alt="SMM Panel Logo"/>
       </div>
     </div>
   );
