@@ -5,11 +5,11 @@ export default function HomePage() {
     <div className="lp-main">
       <div className="lp-content">
         <div className="lp-title">Grow Your Socials with <span style={{color:'#1da4ed'}}>fastsmmpanel</span> 🚀</div>
-        <div className="lp-desc">India’s #1 SMM panel: get <b>guaranteed real growth</b> for Instagram, YouTube, Telegram, and all platforms. Pro wallet system, API-supported orders, and live analytics.</div>
+        <div className="lp-desc">India’s #1 SMM panel: get <b>guaranteed real growth</b> for Instagram, YouTube, Telegram, and all platforms. Pro wallet, API orders, and live tracking.</div>
         <ul className="lp-feature-list">
           <li>🔥 Lightning-fast delivery (10M/day!)</li>
-          <li>🛡️ 100% stable, refill guarantee, instant tracking</li>
-          <li>📈 Modern dashboard — stats, bonus offers, full order history</li>
+          <li>🛡️ 100% refill guarantee, instant tracking</li>
+          <li>📈 Pro dashboard — stats, bonus offers, order history</li>
           <li>💬 24/7 WhatsApp support</li>
         </ul>
         <div className="lp-btns">
