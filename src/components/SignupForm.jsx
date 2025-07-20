@@ -1,75 +1,49 @@
 import React, { useState } from "react";
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import app from "../firebase"; // Make sure you already have /src/firebase.js as described earlier
+import app from "../firebase";
 
 export default function SignupForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
-    setError("");
-    setSuccess(false);
-
+    setErr("");
     if (!name || !email || !password) {
-      setError("🚫 Please fill all fields.");
+      setErr("❌ Fill all fields.");
       return;
     }
     setLoading(true);
     try {
       const auth = getAuth(app);
-      const userCred = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(userCred.user, { displayName: name });
-      setSuccess(true);
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 1500);
-    } catch (err) {
-      setError("❌ " + (err.message || "Signup failed"));
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(cred.user, { displayName: name });
+      window.location.href = "/dashboard";
+    } catch (e) {
+      setErr("❌ " + (e.message || "Signup failed"));
     }
     setLoading(false);
-  };
+  }
 
   return (
     <>
-      <h2 className="login-title">Sign up for LuciXFire Panel</h2>
-      <form className="login-form" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="👤 Full Name"
-          className="login-input"
-          value={name}
-          onChange={e => setName(e.target.value)}
-        />
-        <input
-          type="email"
-          placeholder="📧 Email"
-          className="login-input"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="🔑 Password"
-          className="login-input"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-        />
-        {error && <div className="form-error">{error}</div>}
-        {success && <div style={{ color: "#20c997", margin: "12px 0", fontWeight: 600 }}>🎉 Registration successful!</div>}
-        <button className="login-btn-green" type="submit" disabled={loading}>
-          {loading ? "Signing up..." : "Sign up"}
+      <div className="login-title" style={{fontSize:"1.35em", textAlign:"center"}}>
+        Sign Up for <span style={{color:"#12b954"}}>fastsmmpanel</span> <span role="img" aria-label="rocket">🚀</span>
+      </div>
+      <form className="login-form" onSubmit={handleSubmit} autoComplete="off">
+        <input type="text" className="login-input" placeholder="👤 Full Name" value={name} onChange={e=>setName(e.target.value)} />
+        <input type="email" className="login-input" placeholder="📧 Email" value={email} onChange={e=>setEmail(e.target.value)} />
+        <input type="password" className="login-input" placeholder="🔑 Password" value={password} onChange={e=>setPassword(e.target.value)} />
+        {err && <div className="form-error">{err}</div>}
+        <button className="login-btn-green" disabled={loading}>
+          {loading ? "Signing up..." : "Sign Up"}
         </button>
       </form>
       <div className="login-links">
-        <span>
-          Already have an account?
-          <a href="/login" className="signup-link"> Sign in</a>
-        </span>
+        <span>Already have an account? <a href="/login">Sign in</a></span>
       </div>
     </>
   );
