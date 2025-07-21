@@ -31,7 +31,7 @@ export default function SignupForm() {
   return (
     <>
       <div className="login-title" style={{fontSize:"1.35em", textAlign:"center"}}>
-        Sign Up for <span style={{color:"#12b954"}}>fastsmmpanel</span> <span role="img" aria-label="rocket">🚀</span>
+        Sign Up for <span style={{color:"#12b954"}}>LucixFire Panel</span> <span role="img" aria-label="rocket">🚀</span>
       </div>
       <form className="login-form" onSubmit={handleSubmit} autoComplete="off">
         <input type="text" className="login-input" placeholder="👤 Full Name" value={name} onChange={e=>setName(e.target.value)} />
