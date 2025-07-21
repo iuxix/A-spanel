@@ -1,7 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FaInstagram, FaFacebookF, FaYoutube, FaTelegramPlane, FaTwitter, FaTiktok, FaLinkedinIn, FaDiscord, FaSpotify, FaGlobe } from "react-icons/fa";
+import {
+  FaInstagram, FaFacebookF, FaYoutube, FaTelegramPlane, FaTwitter, FaTiktok,
+  FaSpotify, FaLinkedinIn, FaDiscord, FaGlobe, FaUserAlt, FaLock, FaWhatsapp
+} from "react-icons/fa";
 
+// Social service icon/branding grid for the section at the bottom
 const socialServices = [
   { label: "Instagram", icon: <FaInstagram color="#E4405F" />, bg: "#fff3f8" },
   { label: "Facebook", icon: <FaFacebookF color="#1877F3" />, bg: "#f0f7ff" },
@@ -22,35 +26,27 @@ export default function HomePage() {
       minHeight: "100vh",
       paddingBottom: 40
     }}>
-      {/* Top Navbar */}
+      {/* Navbar */}
       <nav style={{
-        background: "#fff",
-        borderBottom: "1px solid #eef5fb",
+        background: "#fff", borderBottom: "1px solid #eef5fb",
         padding: "26px 0 19px 0",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
         position:"sticky",top:0,zIndex:100
       }}>
         <div style={{
-          fontWeight: 900,
-          color: "#16b687",
-          fontSize: "2em",
-          marginLeft: 24,
-          letterSpacing: "1.2px",
-          fontFamily: "Poppins,sans-serif",
-          display: "flex",
-          alignItems: "center"
+          fontWeight: 900, color: "#16b687", fontSize: "2em",
+          marginLeft: 24, letterSpacing: "1.2px",
+          fontFamily: "Poppins,sans-serif", display: "flex", alignItems: "center"
         }}>
-          <img src="/logo.png" alt="LuciXFire Panel Logo" style={{height:48, width:48, borderRadius:12, marginRight:16, background:"#fff"}} />
+          <img src="/logo.png" alt="LuciXFire Panel Logo"
+               style={{height:48, width:48, borderRadius:12, marginRight:16, background:"#fff"}} />
           LuciXFire Panel
         </div>
         <div style={{marginRight:20, display:"flex", gap:13}}>
           <Link to="/login" style={{
             background: "linear-gradient(92deg,#26e47a 6%,#3fd7ef 94%)",
-            color: "#fff", padding: "12px 32px",
-            borderRadius: "16px", fontWeight: 700, fontSize: "1.13em",
-            textDecoration: "none", border: "none"
+            color: "#fff", padding: "12px 32px", borderRadius: "16px",
+            fontWeight: 700, fontSize: "1.13em", textDecoration: "none", border: "none"
           }}>Sign In</Link>
           <Link to="/signup" style={{
             background: "linear-gradient(90deg,#ffbe23 4%,#13e97a 98%)",
@@ -116,7 +112,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* LOGIN CARD */}
+      {/* Login Card */}
       <div style={{
         maxWidth: 520,
         margin: "0 auto 35px",
@@ -127,11 +123,11 @@ export default function HomePage() {
         padding: "36px 23px 24px"
       }}>
         <div style={{
-          fontWeight: 900, fontSize: "1.32em", letterSpacing: "-1px",
-          marginBottom: 20, textAlign: "center", fontFamily: "Poppins,sans-serif"
+          fontWeight: 900, fontSize: "1.32em", letterSpacing: "-1px", marginBottom: 20, textAlign: "center"
         }}>Sign in to Your Account</div>
         <form style={{
-          display:"flex", flexDirection: "column", gap: 16, marginBottom: 9
+          display:"flex", flexDirection: "column", gap: 16,
+          marginBottom: 9
         }}>
           <input type="text" placeholder="Username Or Email"
             style={{
@@ -187,8 +183,8 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* HOW IT WORKS */}
-      <div style={{maxWidth:900,margin:"0 auto 39px"}}>
+      {/* How It Works */}
+      <div style={{ maxWidth:900, margin:"0 auto 39px" }}>
         <h2 style={{
           textAlign:"center", fontWeight:900, fontSize:"1.46em",
           marginTop:14,marginBottom:28, letterSpacing:"-1px", color:"#242d43"
@@ -196,58 +192,54 @@ export default function HomePage() {
           How It Works
         </h2>
         <div style={{padding:"0 10px 0 10px"}}>
-          {/* For modern style, you can use SVG/react-icons here too, see below. */}
           <div style={{
-              padding: "28px 10px",
-              display: "flex", alignItems: "center", marginBottom: 20,
-              background: "#fff", borderRadius: 19, boxShadow: "0 2px 13px #2defe013", maxWidth: 670, marginLeft: "auto", marginRight: "auto"
-            }}>
-              <span style={{fontSize:"2.4em",marginRight:20}}>
-                <FaUserAlt color="#21e073"/>
-              </span>
-              <div>
-                <div style={{ fontWeight: 800, fontSize: "1.17em", marginBottom: 2, color: "#19373a" }}>
-                  Create An Account & Add Balance
-                </div>
-                <div style={{ fontSize: "1.01em", color: "#217a54", lineHeight: "1.56" }}>
-                  Create your account and deposit funds (min ₹100).
-                </div>
+            padding: "28px 10px", display: "flex", alignItems: "center", marginBottom: 20,
+            background: "#fff", borderRadius: 19, boxShadow: "0 2px 13px #2defe013", maxWidth: 670, marginLeft: "auto", marginRight: "auto"
+          }}>
+            <span style={{fontSize:"2.2em",marginRight:20}}>
+              <FaUserAlt color="#21e073"/>
+            </span>
+            <div>
+              <div style={{ fontWeight: 800, fontSize: "1.11em", marginBottom: 2, color: "#19373a" }}>
+                Create An Account &amp; Add Balance
+              </div>
+              <div style={{ fontSize: ".99em", color: "#217a54", lineHeight: "1.52" }}>
+                Create your account and deposit funds (min ₹100).
               </div>
             </div>
-            <div style={{
-              padding: "28px 10px",
-              display: "flex", alignItems: "center", marginBottom: 20,
-              background: "#fff", borderRadius: 19, boxShadow: "0 2px 13px #2defe013", maxWidth: 670, marginLeft: "auto", marginRight: "auto"
-            }}>
-              <span style={{fontSize:"2.4em",marginRight:20}}>
-                <FaLock color="#ffbe23"/>
-              </span>
-              <div>
-                <div style={{ fontWeight: 800, fontSize: "1.17em", marginBottom: 2, color: "#19373a" }}>
-                  Select Your Targeted Service
-                </div>
-                <div style={{ fontSize: "1.01em", color: "#217a54", lineHeight: "1.56" }}>
-                  Pick your social service from the order dashboard.
-                </div>
+          </div>
+          <div style={{
+            padding: "28px 10px", display: "flex", alignItems: "center", marginBottom: 20,
+            background: "#fff", borderRadius: 19, boxShadow: "0 2px 13px #2defe013", maxWidth: 670, marginLeft: "auto", marginRight: "auto"
+          }}>
+            <span style={{fontSize:"2.2em",marginRight:20}}>
+              <FaLock color="#ffbe23"/>
+            </span>
+            <div>
+              <div style={{ fontWeight: 800, fontSize: "1.11em", marginBottom: 2, color: "#19373a" }}>
+                Select Your Targeted Service
+              </div>
+              <div style={{ fontSize: ".99em", color: "#217a54", lineHeight: "1.52" }}>
+                Pick your social service from the order dashboard.
               </div>
             </div>
-            <div style={{
-              padding: "28px 10px",
-              display: "flex", alignItems: "center", marginBottom: 20,
-              background: "#fff", borderRadius: 19, boxShadow: "0 2px 13px #2defe013", maxWidth: 670, marginLeft: "auto", marginRight: "auto"
-            }}>
-              <span style={{fontSize:"2.4em",marginRight:20}}>
-                <FaWhatsapp color="#21e073"/>
-              </span>
-              <div>
-                <div style={{ fontWeight: 800, fontSize: "1.17em", marginBottom: 2, color: "#19373a" }}>
-                  Provide Link, Quantity &amp; Watch Results!
-                </div>
-                <div style={{ fontSize: "1.01em", color: "#217a54", lineHeight: "1.56" }}>
-                  Paste details, preview pricing, and submit. Track, refill, refund, or chat with admin anytime.
-                </div>
+          </div>
+          <div style={{
+            padding: "28px 10px", display: "flex", alignItems: "center", marginBottom: 20,
+            background: "#fff", borderRadius: 19, boxShadow: "0 2px 13px #2defe013", maxWidth: 670, marginLeft: "auto", marginRight: "auto"
+          }}>
+            <span style={{fontSize:"2.2em",marginRight:20}}>
+              <FaWhatsapp color="#21e073"/>
+            </span>
+            <div>
+              <div style={{ fontWeight: 800, fontSize: "1.11em", marginBottom: 2, color: "#19373a" }}>
+                Provide Link, Quantity &amp; Watch Results!
+              </div>
+              <div style={{ fontSize: ".99em", color: "#217a54", lineHeight: "1.52" }}>
+                Paste details, preview pricing, and submit. Track, refill, refund, or chat with admin anytime.
               </div>
             </div>
+          </div>
         </div>
       </div>
 
@@ -256,6 +248,7 @@ export default function HomePage() {
         background: "#fff", borderRadius: 21, boxShadow: "0 4px 24px #d2f6d426",
         maxWidth: 410, margin: "0 auto 27px", padding: "26px 22px"
       }}>
+        {/* ...stats as in your code... */}
         <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
           <span style={{fontSize:"2em",marginRight:13}}>🧾</span>
           <span style={{ fontWeight: 900, fontSize: "1.17em", color: "#184b39" }}>726724</span>
@@ -271,14 +264,14 @@ export default function HomePage() {
           <span style={{ fontWeight: 900, fontSize: "1.11em", color: "#32cc69" }}>24/7</span>
           <span style={{ marginLeft: 12, color: "#1f1f1f" }}>Fastest Support</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center"}}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <span style={{fontSize:"2em",marginRight:13}}>🎉</span>
           <span style={{ fontWeight: 900, fontSize: "1.11em", color: "#cc32b2" }}>3058+</span>
           <span style={{ marginLeft: 12, color: "#1f1f1f" }}>Happy Clients</span>
         </div>
       </div>
 
-      {/* Services Grid: SVG Icons */}
+      {/* Services Grid Section */}
       <div style={{ maxWidth:900, margin:"53px auto 32px",textAlign:"center" }}>
         <h2 style={{ fontWeight:900, fontSize:"2em", marginBottom:8 }}>Top SMM Services We Provide</h2>
         <div style={{
