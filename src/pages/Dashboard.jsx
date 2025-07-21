@@ -1,184 +1,164 @@
 import React, { useState } from "react";
-import { FaWhatsapp, FaInstagram, FaTelegramPlane, FaYoutube, FaFacebookF, FaTiktok, FaTwitter, FaGlobe } from "react-icons/fa";
+import { FaUserCircle, FaEllipsisV, FaWallet, FaHistory, FaCog } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
-const categories = [
-  { name: "Instagram", icon: <FaInstagram color="#E4405F"/>, color: "#fff6fa" },
-  { name: "YouTube",   icon: <FaYoutube color="#F00"/>, color: "#fff6f6" },
-  { name: "Telegram",  icon: <FaTelegramPlane color="#229ED9"/>, color: "#f6fbff" },
-  { name: "Facebook",  icon: <FaFacebookF color="#1877F3"/>, color: "#f3f9ff" },
-  { name: "TikTok",    icon: <FaTiktok color="#111"/>, color: "#f7f8fa" },
-  { name: "Twitter",   icon: <FaTwitter color="#1D9BF0"/>, color: "#f6fcff" },
-  { name: "Others",    icon: <FaGlobe color="#14b67e"/>, color: "#f6fff6" }
-];
-
-// Example real SMM services, prices set to be cheaper than typical panel rates
-const allServices = [
-  // Instagram
-  {cat:"Instagram", title:"IG Reels Views (No Drop)", desc:"Instant | 10M/Day | Lifetime refill", price: 0.11, min: 100, max: 1000000},
-  {cat:"Instagram", title:"IG Followers [Stable]", desc:"Real | 0% Drop | 1k-500k | 3h avg", price: 16.5, min: 100, max: 500000},
-  {cat:"Instagram", title:"IG Likes [Non Drop]", desc:"HQ | Instant | No Drop", price: 4.5, min: 50, max: 50000},
-  // YouTube
-  {cat:"YouTube", title:"YT Subscribers [Fast]", desc:"Fastest Delivery | 100% Real", price: 59, min: 10, max: 50000},
-  {cat:"YouTube", title:"YT Views [Safe]", desc:"Lifetime | HR & Watchtime | 1M/Day", price: 0.06, min: 100, max: 1000000},
-  {cat:"YouTube", title:"YT Likes [HQ]", desc:"Organic | Non-drop", price: 5.1, min: 20, max: 20000},
-  // Telegram
-  {cat:"Telegram", title:"TG Members [Instant]", desc:"Indian & Int'l | 1M/Day", price: 39, min: 100, max: 200000},
-  {cat:"Telegram", title:"TG Post Views", desc:"No Drop | Same Day | Best Price", price: 0.045, min: 500, max: 1000000},
-  // Facebook
-  {cat:"Facebook", title:"FB Page Likes [Safe]", desc:"Lifetime | Refill 365D | Real", price: 18, min: 50, max: 100000},
-  // TikTok
-  {cat:"TikTok", title:"TikTok Followers", desc:"Non-Drop | Fastest | Global", price: 22.5, min: 100, max: 100000},
-  // Twitter
-  {cat:"Twitter", title:"Twitter Followers [Safe]", desc:"Non Drop | 365 Days Refill", price: 15, min: 100, max: 100000},
-  // Others
-  {cat:"Others", title:"Website Traffic Booster", desc:"Geo-Targeted | Real Visitors", price: 0.25, min: 1000, max: 10000000}
-];
-
-export default function Dashboard() {
-  const [selectedCat, setSelectedCat] = useState(categories[0].name);
+// Dummy OrderSection (replace with your real OrderSection component as needed)
+function OrderSection() {
   const [selected, setSelected] = useState(null);
-  const [link, setLink] = useState("");
-  const [qty, setQty] = useState("");
-  const [msg, setMsg] = useState("");
-
-  const filteredServices = allServices.filter(s => s.cat === selectedCat);
-
+  const services = [
+    { id: "IG01", title: "Instagram Reels Views 🚀", desc: "Fast, no-drop, refill", avgtime: "3h", min: 100, max: 1000000, price: 0.12 },
+    { id: "IG02", title: "Instagram Followers 🌟", desc: "High quality, instant", avgtime: "2h", min: 50, max: 50000, price: 1.23 },
+    { id: "YT01", title: "YouTube Likes 👍", desc: "Organic, top quality", avgtime: "1h", min: 20, max: 20000, price: 0.34 },
+    { id: "TG01", title: "Telegram Members 🚀", desc: "Real, fast join", avgtime: "2h", min: 100, max: 50000, price: 1.01 },
+    { id: "TW01", title: "Twitter Followers ⚡", desc: "Stable, no drop", avgtime: "4h", min: 50, max: 25000, price: 1.08 },
+    { id: "SP01", title: "Spotify Plays 🎼", desc: "Global, refill, fast", avgtime: "30m", min: 200, max: 100000, price: 0.67 }
+  ];
+  const [qty, setQty] = useState(""); const [link, setLink] = useState(""); const [msg, setMsg] = useState("");
   function handleOrder(e) {
     e.preventDefault();
-    if (!selected || !link || !qty) return setMsg("❌ Fill all fields.");
-    if (qty < selected.min || qty > selected.max) return setMsg(`❌ Quantity: Min ${selected.min} - Max ${selected.max}`);
-    setMsg(`✅ Order Placed: ${selected.title} × ${qty}`);
-    setLink(""); setQty(""); setSelected(null);
+    if (!selected || !qty || !link) return setMsg("❌ Please fill all fields.");
+    if (parseInt(qty) < selected.min || parseInt(qty) > selected.max)
+      return setMsg(`❌ Min ${selected.min} - Max ${selected.max}`);
+    setMsg(`✅ Order placed for ${qty} ${selected.title}!`);
+    setQty(""); setLink("");
+  }
+  return (
+    <div style={{
+      margin: "35px auto", maxWidth: 520, background: "#fff", borderRadius: 23,
+      boxShadow: "0 2px 21px #21f4e213", padding: 24, border: "1.3px solid #e0f2fe"
+    }}>
+      <h3 style={{ fontWeight: 900, fontSize: "1.18em", marginBottom: 14, color: "#144b3d" }}>Place New Order</h3>
+      <div>
+        <label style={{ fontWeight: 700, marginBottom: 7, display: "block" }}>Select Service</label>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
+          {services.map((s) => (
+            <button key={s.id}
+              onClick={() => { setSelected(s); setMsg(""); }}
+              style={{
+                padding: "11px 17px", borderRadius: 8, border: "none", cursor: "pointer",
+                fontWeight: 600, background: selected && selected.id === s.id ? "linear-gradient(93deg,#1eea8e,#3ac7f3)" : "#f7f7fa",
+                color: selected && selected.id === s.id ? "#fff" : "#19423e", boxShadow: "0 1px 5px #1ae7d015"
+              }}>{s.title}</button>
+          ))}
+        </div>
+      </div>
+      {selected && (
+        <form onSubmit={handleOrder} style={{ marginTop: 3 }}>
+          <div style={{ fontWeight: 700, color: "#19869c" }}>Description: <span style={{ fontWeight: 400 }}>{selected.desc}</span></div>
+          <div style={{ display: "flex", gap: 13, margin: "14px 0" }}>
+            <span style={{ fontSize: ".95em" }}>⏰ {selected.avgtime} avg</span>
+            <span style={{ fontSize: ".95em" }}>Min: {selected.min} - Max: {selected.max}</span>
+            <span style={{ fontSize: ".95em" }}>₹{selected.price} per 1K</span>
+          </div>
+          <input type="text" placeholder="Paste Link" style={inputStyle} value={link} onChange={e => setLink(e.target.value)} />
+          <input type="number" placeholder="Quantity" style={inputStyle} value={qty} onChange={e => setQty(e.target.value.replace(/^0+/, ""))} />
+          <div style={{ fontWeight: 600, marginBottom: 7, marginTop: 4 }}>
+            Charge: <span style={{ color: "#1db37e" }}>₹{qty && selected.price ? ((selected.price * qty) / 1000).toFixed(2) : "0.00"}</span>
+          </div>
+          {msg && <div style={{ color: msg.startsWith("✅") ? "#1bc375" : "#ea344a", fontWeight: 700, marginBottom: 8 }}>{msg}</div>}
+          <button type="submit" style={orderBtn}>Place Order 🚀</button>
+        </form>
+      )}
+    </div>
+  );
+}
+const inputStyle = {
+  width: "100%", margin: "6px 0",
+  padding: "13px 12px", borderRadius: 10, border: "1.3px solid #e6f7ff", fontSize: "1.08em"
+};
+const orderBtn = {
+  background: "linear-gradient(90deg,#24fa92,#fce161 97%)", color: "#144b3d",
+  borderRadius: 11, fontWeight: 800, fontSize: "1.13em", padding: "14px 0", marginTop: 8, border: "none", width: "100%"
+};
+
+export default function Dashboard() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [profile, setProfile] = useState(false);
+  const [settings, setSettings] = useState(false);
+  const [history, setHistory] = useState(false);
+  const [funds, setFunds] = useState(false);
+
+  function showMenu(panel) {
+    setMenuOpen(false);
+    setProfile(false); setSettings(false); setHistory(false); setFunds(false);
+    if (panel === "profile") setProfile(true);
+    if (panel === "settings") setSettings(true);
+    if (panel === "history") setHistory(true);
+    if (panel === "funds") setFunds(true);
+    if (panel === "logout") window.location.href = "/login";
   }
 
   return (
-    <div style={{
-      minHeight:"100vh", background:"#f7fafb"
-    }}>
-      {/* Header */}
+    <div style={{ background: "#f7fcfb", minHeight: "100vh", padding: "0 0 90px" }}>
+      {/* Custom Navbar */}
       <div style={{
-        background:"#fff",
-        padding:"30px 0 16px 0",
-        boxShadow:"0 1px 18px #22e2b911"
+        background: "#fff", padding: "19px 7vw 17px 7vw",
+        fontWeight: 900, fontSize: "1.17em", color: "#15e98e",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        borderBottom: "1.1px solid #e8f8ff", boxShadow: "0 2px 15px #00edff12"
       }}>
-        <div style={{
-          maxWidth:900, margin:"0 auto", display:"flex",
-          justifyContent:"space-between", alignItems:"center"
-        }}>
-          <div style={{fontSize:"2em",fontWeight:900, color:"#13ac7e", letterSpacing:"1.2px"}}>
-            <img src="/logo.png" alt="logo" style={{
-              width:50, height:50, borderRadius:19, marginRight:15, verticalAlign: "middle", background:"#fff", boxShadow:"0 3px 18px #2be2e40d"
-            }}/>
-            LuciXFire Panel Dashboard
-          </div>
-          <Link to="/" style={{fontWeight:600, color:"#1aadfa",fontSize:"1.16em"}}>Home</Link>
-        </div>
-      </div>
-
-      {/* Categories */}
-      <div style={{
-        display:"flex", flexWrap:"wrap", justifyContent:"center",gap:16,
-        maxWidth:920, margin:"32px auto 0"
-      }}>
-        {categories.map(c => (
-          <button key={c.name}
-            style={{
-              background: selectedCat === c.name ? "#e5fff3" : c.color,
-              border: selectedCat === c.name ? "2.5px solid #18d87d" : "1.5px solid #f0f8f2",
-              borderRadius: 17,
-              fontWeight:800,
-              fontSize:"1.11em",
-              minWidth:"115px",
-              boxShadow:"0 2px 18px #15e3b712",
-              padding:"15px 17px", cursor:"pointer",
-              display:"flex",alignItems:"center",gap:14
-            }}
-            onClick={()=>{setSelectedCat(c.name);setSelected(null);setMsg("");}}
-          >{c.icon}{c.name}</button>
-        ))}
-      </div>
-
-      {/* Services */}
-      <div style={{
-        maxWidth:680, margin:"38px auto 0", background:"#fff",
-        borderRadius:19, boxShadow:"0 5px 33px #0defd93c", padding:"30px 17px 22px 17px"
-      }}>
-        <div style={{
-          fontWeight:900, fontSize:"1.37em", marginBottom:15,
-          color:"#1b846b"
-        }}>{selectedCat} Services</div>
-        <div style={{
-          display:"flex", flexDirection:"column",gap:18, marginBottom:10
-        }}>
-          {filteredServices.map(s =>
-            <div key={s.title} onClick={()=>{setSelected(s);setMsg("");}}
-              style={{
-                background:selected&&selected.title===s.title?"#e6fff6":"#fafffd",
-                border:selected&&selected.title===s.title?"2.4px solid #22e97f":"1.4px solid #eafcef",
-                borderRadius:11,padding:"17px 13px",fontWeight:700,fontSize:"1.09em",
-                display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",
-                boxShadow:"0 2px 7px #23e9cf09"
-              }}>
-              <div>
-                <div style={{fontWeight:800, color:"#0abd4e"}}>{s.title}</div>
-                <div style={{color:"#1d4052",fontWeight:500,fontSize:".97em",margin:"4px 0 0 0"}}>{s.desc}</div>
-                <div style={{fontWeight:500,fontSize:".98em",color:"#19b57d",marginTop:6}}>
-                  ₹{s.price} per 1K | Min {s.min} | Max {s.max}
-                </div>
-              </div>
-              <div style={{
-                background:"#22eadd",borderRadius:"50%",color:"#fff",
-                width:39,height:39,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.26em"
-              }}>
-                {categories.find(c=>c.name===s.cat)?.icon}
-              </div>
+        <span style={{ fontWeight: 900, fontSize: "1.12em", letterSpacing: ".5px" }}>LuciXFire Panel</span>
+        <div style={{ position: "relative" }}>
+          <button style={{
+            background: "none", border: "none", cursor: "pointer", padding: 0, marginLeft: 6
+          }} title="Menu" onClick={() => setMenuOpen(o => !o)}>
+            <FaEllipsisV size={28} color="#1ab288" />
+          </button>
+          {menuOpen && (
+            <div style={{
+              position: "absolute", right: 0, top: 34, zIndex: 10, minWidth: 180,
+              background: "#fff", borderRadius: 14, boxShadow: "0 7px 33px #11e7e022", fontSize: "1.09em", fontWeight: 500
+            }}>
+              <div style={menuItem} onClick={() => showMenu("profile")}><FaUserCircle /> Profile</div>
+              <div style={menuItem} onClick={() => showMenu("funds")}><FaWallet /> Add Funds</div>
+              <div style={menuItem} onClick={() => showMenu("history")}><FaHistory /> History</div>
+              <div style={menuItem} onClick={() => showMenu("settings")}><FaCog /> Settings</div>
+              <div style={{ borderTop: "1px solid #eee", margin: "6px 0" }} />
+              <div style={{ ...menuItem, color: "#f44b5b", fontWeight: 700 }} onClick={() => showMenu("logout")}>Logout</div>
             </div>
           )}
         </div>
-        {selected &&
-          <form onSubmit={handleOrder} style={{background:"#f7fcf8",borderRadius:13,boxShadow:"0 2px 14px #22be7a18",padding:"16px 12px",marginTop:7}}>
-            <div style={{fontWeight:700,marginBottom:10,color:"#0e9963"}}>{selected.title}</div>
-            <div style={{display:"flex",gap:16,marginBottom:11}}>
-              <input value={link} onChange={e=>setLink(e.target.value)} placeholder="Paste link" style={{
-                flex:2,padding:"12px 8px",borderRadius:9,border:"1.2px solid #a8f5d7",fontSize:"1em"
-              }}/>
-              <input type="number" value={qty} onChange={e=>setQty(e.target.value)} placeholder="Quantity" style={{
-                flex:1, padding:"12px 8px",borderRadius:9,border:"1.2px solid #a8f5d7",fontSize:"1em"
-              }}/>
-            </div>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              <span style={{fontWeight:700}}>Total: </span>
-              <span style={{fontWeight:800,color:"#ffb42b"}}>
-                ₹{selected.price && qty ? ((selected.price*qty)/1000).toFixed(2) : "0.00"}
-              </span>
-            </div>
-            {msg && <div style={{
-              marginTop:7,
-              color:msg.startsWith("✅")?"#12905c":"#e42b54",
-              fontWeight:700
-            }}>{msg}</div>}
-            <button style={{
-              marginTop:11,
-              width:"100%",
-              background:"linear-gradient(90deg,#1de37e,#ffd532 98%)",
-              color: "#222", border: "none",
-              borderRadius: 9,
-              fontWeight: 800, fontSize: "1.19em",
-              padding:"13px 0",cursor:"pointer"
-            }}>Place Order</button>
-          </form>
-        }
-        <div style={{display:"flex",justifyContent:"flex-end",marginTop:17}}>
-          <a href="https://wa.me/?text=Hi!%20I%20need%20SMM%20Panel%20help%20on%20LuciXFire%20Panel" target="_blank" rel="noreferrer"
-            style={{
-              display:"flex",alignItems:"center",gap:6,
-              background:"#20d660",color:"#fff",fontWeight:700,padding:"8px 18px",
-              borderRadius:12,textDecoration:"none",boxShadow:"0 2px 10px #38e49a15"
-            }}>
-            <FaWhatsapp style={{fontSize:"1.2em"}}/> WhatsApp Support
-          </a>
-        </div>
+      </div>
+
+      {/* Main content: Order Section */}
+      <OrderSection />
+
+      {/* Modals (render as needed; dummy placeholders here) */}
+      {profile && <Modal title="Profile" onClose={() => setProfile(false)}><div>Your user details here.</div></Modal>}
+      {settings && <Modal title="Settings" onClose={() => setSettings(false)}><div>Settings coming soon.</div></Modal>}
+      {history && <Modal title="History" onClose={() => setHistory(false)}><div>Your orders and funds will display here.</div></Modal>}
+      {funds && <Modal title="Add Funds" onClose={() => setFunds(false)}><div>Deposit via UPI, upload payment slip, see live admin status.</div></Modal>}
+    </div>
+  );
+}
+
+// Generic Modal component for all dashboard panels
+function Modal({ title, onClose, children }) {
+  return (
+    <div style={{
+      position: "fixed", left: 0, top: 0, width: "100vw", height: "100vh",
+      background: "#21ffe024", zIndex: 90, display: "flex", alignItems: "center", justifyContent: "center"
+    }}>
+      <div style={{
+        background: "#fff", padding: "34px 28px 24px 28px", borderRadius: 17,
+        minWidth: 330, maxWidth: "92vw", boxShadow: "0 10px 40px #29e7e818", position: "relative"
+      }}>
+        <button
+          onClick={onClose}
+          style={{
+            position: "absolute", right: 17, top: 14, background: "none", border: "none", fontSize: "2.11em", color: "#ff33af", cursor: "pointer"
+          }}
+        >&times;</button>
+        <h2 style={{fontWeight:900,marginBottom:13,marginTop:0,fontSize:"1.19em", letterSpacing:"-1.1px", color:"#17aa68"}}>{title}</h2>
+        {children}
       </div>
     </div>
   );
 }
+
+const menuItem = {
+  padding: "13px 23px 13px 19px",
+  display: "flex", alignItems: "center", gap: 10,
+  cursor: "pointer",
+  border: "none", outline: "none", background: "none"
+};
