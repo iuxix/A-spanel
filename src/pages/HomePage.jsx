@@ -17,50 +17,67 @@ export default function HomePage() {
         position:"sticky",top:0,zIndex:100
       }}>
         <div style={{
-          fontWeight: 900, color: "#0ad078",
+          fontWeight: 900, color: "#16b687",
           fontSize: "2em", marginLeft: 24, letterSpacing: "1.2px", fontFamily: "Poppins,sans-serif"
         }}>
           LuciXFire Panel
         </div>
         <div style={{marginRight:20, display:"flex", gap:13}}>
-          <Link to="/login" style={mainBtn("#1fee7c", "#68e0ee", "#fff")}>Sign In</Link>
-          <Link to="/signup" style={mainBtn("#ftc061", "#fbbf23", "#232")}>Sign Up</Link>
-          <Link to="/admin" style={mainBtn("#4657fa", "#ffc805", "#fff")}>Admin</Link>
+          {/* All nav buttons are bold colorful gradients */}
+          <Link to="/login" style={{
+            background: "linear-gradient(92deg,#26e47a 6%,#3fd7ef 94%)",
+            color: "#fff", padding: "12px 32px",
+            borderRadius: "16px", fontWeight: 700, fontSize: "1.13em",
+            textDecoration: "none", boxShadow: "0 2px 11px #13f6ea10", border: "none"
+          }}>Sign In</Link>
+          <Link to="/signup" style={{
+            background: "linear-gradient(90deg,#ffbe23 4%,#13e97a 98%)",
+            color: "#fff", padding: "12px 32px",
+            borderRadius: "16px", fontWeight: 700, fontSize: "1.13em",
+            textDecoration: "none", boxShadow: "0 2px 11px #fae94814", border: "none"
+          }}>Sign Up</Link>
+          <Link to="/admin" style={{
+            background: "linear-gradient(92deg,#372ae2 7%,#f9c004 91%)",
+            color: "#fff", padding: "12px 32px",
+            borderRadius: "16px", fontWeight: 700, fontSize: "1.13em",
+            textDecoration: "none", boxShadow: "0 2px 11px #bfc9ff10", border: "none"
+          }}>Admin</Link>
         </div>
       </nav>
 
-      {/* Hero Block */}
+      {/* Hero */}
       <div style={{
         maxWidth: 1150, margin: "0 auto",
         display:"flex", flexWrap:"wrap", alignItems:"center",
-        gap:30, padding:"40px 6vw 20px 6vw"
+        gap:30, padding:"32px 6vw 15px 6vw"
       }}>
-        <div style={{flex:"1 1 450px", minWidth:270}}>
+        <div style={{flex:"1 1 440px", minWidth:270}}>
           <h1 style={{
-            fontSize: "2.2em", lineHeight: 1.13, fontWeight: 900,
-            margin: "9px 0 15px", letterSpacing:"-1.2px", color:"#202d45"
+            fontSize: "2.05em", lineHeight: 1.16, fontWeight: 900,
+            margin: "15px 0 14px", letterSpacing:"-1.0px", color:"#202d45"
           }}>
             Boost Your Social Media Presence<br/>
-            with <span style={{ color: "#ffbe20" }}>LuciXFire Panel</span> #1
+            with <span style={{ color: "#ffbe20" }}>LuciXFire Panel</span> <span style={{fontSize:"1.1em"}}>#1</span>
           </h1>
           <div style={{
-            fontSize: "1.16em", marginBottom: 17,
-            color: "#234142", lineHeight: "1.7"
+            fontWeight:"600",
+            fontSize: "1.16em", marginBottom: 19,
+            color: "#22493b", lineHeight: "1.66"
           }}>
-            <b>Cheapest &amp; Fastest SMM</b> services for all social media.<br/>
-            Wallet, API, analytics, auto refill, 24/7 WhatsApp support.
+            Cheapest &amp; fastest SMM platform for influencers, agencies, and marketers.<br/>
+            Wallet, API, instant analytics, <b>auto refill</b>, real admin, <span style={{ color: "#19cc9b" }}>24/7 WhatsApp</span>.
           </div>
-          <ul style={{paddingLeft:18, margin:"2px 0 25px 0", color:"#194635", fontWeight:600}}>
-            <li style={{marginBottom:6}}>🌟 10+ Categories: Instagram, YouTube, Telegram, more</li>
-            <li style={{marginBottom:6}}>💸 Deposit from ₹100, instant refund &amp; full trust</li>
-            <li>👑 Used by 3K+ Indian resellers—API, refill, tracking</li>
+          <ul style={{paddingLeft:19, margin:"-2px 0 26px 0", color:"#144131", fontWeight:600, fontSize:"1.06em"}}>
+            <li style={{marginBottom:8}}>🌟 10+ Categories: Instagram, YouTube, Telegram, more</li>
+            <li style={{marginBottom:8}}>💸 Deposit from ₹100, refund guaranteed</li>
+            <li>👑 Trusted by 3000+ Indian resellers. Track and refill any order.</li>
           </ul>
           <Link to="/signup" style={{
             display:"inline-block", fontWeight: 700, textDecoration: "none",
             padding: "15px 46px", fontSize: "1.07em",
             background: "linear-gradient(90deg,#21e073,#fbaf09 97%)",
-            color: "#fff", borderRadius: 21, marginTop:6,
-            boxShadow:"0 2px 16px #2ad88513"
+            color: "#fff", borderRadius: 21, marginTop:7,
+            boxShadow: "0 2px 16px #2ad88513"
           }}>
             Sign Up Today
           </Link>
@@ -81,40 +98,74 @@ export default function HomePage() {
 
       {/* LOGIN CARD */}
       <div style={{
-        maxWidth: 500,
+        maxWidth: 520,
         margin: "0 auto 35px",
         borderRadius: 29,
         background: "#fff",
-        boxShadow: "0 8px 50px #c1f1ff28",
+        boxShadow: "0 12px 44px #d2f9ef26",
         border: "1px solid #ecf0f6",
-        padding: "38px 25px 25px", position: "relative"
+        padding: "36px 23px 24px", position: "relative"
       }}>
         <div style={{
-          fontWeight: 900, fontSize: "1.35em", letterSpacing: "-1px",
-          marginBottom: 19, textAlign: "center", fontFamily: "Poppins,sans-serif"
+          fontWeight: 900, fontSize: "1.32em", letterSpacing: "-1px",
+          marginBottom: 20, textAlign: "center", fontFamily: "Poppins,sans-serif"
         }}>Sign in to Your Account</div>
         <form style={{
-          display:"flex", flexDirection: "column", gap: 16,
-          marginBottom: 7
+          display:"flex", flexDirection: "column", gap: 16, marginBottom: 9
         }}>
-          <div style={{display:"flex", gap:10, flexDirection:"row", width:"100%"}}>
-            <input type="text" placeholder="Username Or Email" style={loginInput("13px 13px 13px 13px")} autoComplete="username"/>
-            <input type="password" placeholder="Password" style={loginInput("13px 13px 13px 13px")} autoComplete="current-password"/>
-          </div>
-          <button type="button" style={mainBtn("#29ff6b", "#25e1c6", "#fff", "100%", 12)}>Sign in</button>
-          <button type="button"
-                  style={{...mainBtn("#FFC371", "#FF5F6D", "#fff", "100%", 12),
-                    background: "linear-gradient(90deg,#FF5858,#F09819)", marginTop:0}}>
-            Login with Google
-          </button>
+          <input type="text" placeholder="Username Or Email"
+            style={{
+              width: "100%",
+              borderRadius: "11px",
+              border: "1.3px solid #e2e6ee",
+              background: "#fafdff",
+              padding: "15px 14px",
+              fontSize: "1.09em",
+              fontWeight: 600,
+              outline: "none"
+            }} autoComplete="username"/>
+          <input type="password" placeholder="Password"
+            style={{
+              width: "100%",
+              borderRadius: "11px",
+              border: "1.3px solid #e2e6ee",
+              background: "#fafdff",
+              padding: "15px 14px",
+              fontSize: "1.09em",
+              fontWeight: 600,
+              outline: "none"
+            }} autoComplete="current-password"/>
+          {/* Error message here if needed:
+          <div style={{color:"#fa3c53",fontWeight:700,textAlign:"center"}}>❌ Invalid password</div>*/}
+          <button type="button" style={{
+            background: "linear-gradient(90deg,#19f477,#0aa06b 97%)",
+            color: "#fff",
+            borderRadius: "11px",
+            fontWeight: 900,
+            fontSize: "1.11em",
+            padding: "13px 0",
+            width: "100%",
+            marginBottom: 7,
+            border: "none"
+          }}>Sign In</button>
+          <button type="button" style={{
+            background: "linear-gradient(90deg,#FF5858,#F09819)",
+            color: "#fff",
+            borderRadius: "11px",
+            fontWeight: 900,
+            fontSize: "1.11em",
+            padding: "13px 0",
+            width: "100%",
+            border: "none"
+          }}>Login with Google</button>
         </form>
         <div style={{
           display:"flex", flexWrap:"wrap", justifyContent: "center", alignItems: "center",
-          gap: 12, fontSize: "1em", color: "#2ea385", marginTop: 6, textAlign:"center"
+          gap: 12, fontSize: "1em", color: "#30a366", marginTop: 8, textAlign:"center"
         }}>
           <span>Do not have an account?</span>
-          <Link to="/signup" style={{ color: "#ffb103", fontWeight: 700 }}>Sign up</Link>
-          <Link to="/forgot" style={{ color: "#2bbbef", marginLeft:7 }}>Forgot Password?</Link>
+          <Link to="/signup" style={{ color: "#ffa703", fontWeight: 700 }}>Sign up</Link>
+          <Link to="/forgot" style={{ color: "#2bbbef", marginLeft: 7 }}>Forgot Password?</Link>
         </div>
       </div>
 
@@ -214,36 +265,4 @@ export default function HomePage() {
       </div>
     </div>
   );
-}
-
-// --- BUTTON & INPUT STYLE HELPERS ---
-
-function mainBtn(col1, col2, txt, width="auto", radius=13) {
-  return {
-    background: `linear-gradient(90deg,${col1},${col2})`,
-    color: txt,
-    borderRadius: radius,
-    fontWeight: 700,
-    padding: "13px 38px",
-    fontSize: "1.09em",
-    border: "none",
-    textDecoration: "none",
-    boxShadow: "0 2px 14px #1ae7fc17",
-    cursor: "pointer",
-    width,
-    transition: "filter .12s"
-  };
-}
-
-function loginInput(pad="14px 14px") {
-  return {
-    width: "100%",
-    borderRadius: "12px",
-    border: "1.2px solid #e2e6ee",
-    background: "#fafdff",
-    padding: pad,
-    fontSize: "1.1em",
-    fontWeight: 600,
-    outline: "none"
-  };
 }
