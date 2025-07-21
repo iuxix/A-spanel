@@ -1,7 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { FaInstagram, FaFacebookF, FaYoutube, FaTelegramPlane, FaTwitter, FaTiktok, FaLinkedinIn, FaDiscord, FaSpotify, FaGlobe } from "react-icons/fa";
 
-const LOGO_SRC = "/logo.png";
+const socialServices = [
+  { label: "Instagram", icon: <FaInstagram color="#E4405F" />, bg: "#fff3f8" },
+  { label: "Facebook", icon: <FaFacebookF color="#1877F3" />, bg: "#f0f7ff" },
+  { label: "YouTube", icon: <FaYoutube color="#FF0000" />, bg: "#fff5f3" },
+  { label: "Telegram", icon: <FaTelegramPlane color="#229ED9" />, bg: "#f1f9ff" },
+  { label: "Twitter", icon: <FaTwitter color="#1D9BF0" />, bg: "#f3faff" },
+  { label: "Tiktok", icon: <FaTiktok color="#000" />, bg: "#f5f5f5" },
+  { label: "Spotify", icon: <FaSpotify color="#1ED760" />, bg: "#f8fff3" },
+  { label: "LinkedIn", icon: <FaLinkedinIn color="#0A66C2" />, bg: "#f4f6fa" },
+  { label: "Discord", icon: <FaDiscord color="#5865F2" />, bg: "#f6f4ff" },
+  { label: "Website", icon: <FaGlobe color="#2CC45C" />, bg: "#f7fdf6" }
+];
 
 export default function HomePage() {
   return (
@@ -15,8 +27,10 @@ export default function HomePage() {
         background: "#fff",
         borderBottom: "1px solid #eef5fb",
         padding: "26px 0 19px 0",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        position:"sticky",top:0,zIndex:100,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        position:"sticky",top:0,zIndex:100
       }}>
         <div style={{
           fontWeight: 900,
@@ -28,48 +42,29 @@ export default function HomePage() {
           display: "flex",
           alignItems: "center"
         }}>
-          {/* Auto logo on left */}
-          <img
-            src={LOGO_SRC}
-            alt="LuciXFire Panel Logo"
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: "50%",
-              marginRight: 15,
-              objectFit: "cover",
-              boxShadow: "0 2px 16px #1de88511"
-            }}
-            onError={e => {
-              e.target.onerror = null;
-              e.target.src = "https://ui-avatars.com/api/?background=16b687&color=fff&bold=true&name=L+F";
-            }}
-          />
+          <img src="/logo.png" alt="LuciXFire Panel Logo" style={{height:48, width:48, borderRadius:12, marginRight:16, background:"#fff"}} />
           LuciXFire Panel
         </div>
         <div style={{marginRight:20, display:"flex", gap:13}}>
-          {/* All nav buttons are bold colorful gradients */}
           <Link to="/login" style={{
             background: "linear-gradient(92deg,#26e47a 6%,#3fd7ef 94%)",
             color: "#fff", padding: "12px 32px",
             borderRadius: "16px", fontWeight: 700, fontSize: "1.13em",
-            textDecoration: "none", boxShadow: "0 2px 11px #13f6ea10", border: "none"
+            textDecoration: "none", border: "none"
           }}>Sign In</Link>
           <Link to="/signup" style={{
             background: "linear-gradient(90deg,#ffbe23 4%,#13e97a 98%)",
-            color: "#fff", padding: "12px 32px",
-            borderRadius: "16px", fontWeight: 700, fontSize: "1.13em",
-            textDecoration: "none", boxShadow: "0 2px 11px #fae94814", border: "none"
+            color: "#fff", padding: "12px 32px", borderRadius: "16px",
+            fontWeight: 700, fontSize: "1.13em", textDecoration: "none", border: "none"
           }}>Sign Up</Link>
           <Link to="/admin" style={{
             background: "linear-gradient(92deg,#372ae2 7%,#f9c004 91%)",
-            color: "#fff", padding: "12px 32px",
-            borderRadius: "16px", fontWeight: 700, fontSize: "1.13em",
-            textDecoration: "none", boxShadow: "0 2px 11px #bfc9ff10", border: "none"
+            color: "#fff", padding: "12px 32px", borderRadius: "16px",
+            fontWeight: 700, fontSize: "1.13em", textDecoration: "none", border: "none"
           }}>Admin</Link>
         </div>
       </nav>
-
+      
       {/* Hero */}
       <div style={{
         maxWidth: 1150, margin: "0 auto",
@@ -129,7 +124,7 @@ export default function HomePage() {
         background: "#fff",
         boxShadow: "0 12px 44px #d2f9ef26",
         border: "1px solid #ecf0f6",
-        padding: "36px 23px 24px", position: "relative"
+        padding: "36px 23px 24px"
       }}>
         <div style={{
           fontWeight: 900, fontSize: "1.32em", letterSpacing: "-1px",
@@ -201,27 +196,58 @@ export default function HomePage() {
           How It Works
         </h2>
         <div style={{padding:"0 10px 0 10px"}}>
-          {[
-            {icon: "/social-icons/account-gradient.png", title: "Create An Account & Add Balance", desc: "Create your account and deposit funds (min ₹100)."},
-            {icon: "/social-icons/bag-gradient.png", title: "Select Your Targeted Service", desc: "Pick your social service from the order dashboard."},
-            {icon: "/social-icons/link-gradient.png", title: "Provide Link, Quantity & Watch Results!", desc: "Paste details, preview pricing, and submit your order. Track, refill, refund, or chat live with admin anytime."}
-          ].map((step, idx) => (
-            <div key={step.title} style={{
-              padding: "31px 13px",
-              display: "flex", alignItems: "center", marginBottom: 19,
+          {/* For modern style, you can use SVG/react-icons here too, see below. */}
+          <div style={{
+              padding: "28px 10px",
+              display: "flex", alignItems: "center", marginBottom: 20,
               background: "#fff", borderRadius: 19, boxShadow: "0 2px 13px #2defe013", maxWidth: 670, marginLeft: "auto", marginRight: "auto"
             }}>
-              <img src={step.icon} alt="" style={{ width: 63, height: 63, marginRight: 18, borderRadius:"50%", background:"#f9fcff"}} />
+              <span style={{fontSize:"2.4em",marginRight:20}}>
+                <FaUserAlt color="#21e073"/>
+              </span>
               <div>
                 <div style={{ fontWeight: 800, fontSize: "1.17em", marginBottom: 2, color: "#19373a" }}>
-                  {step.title}
+                  Create An Account & Add Balance
                 </div>
                 <div style={{ fontSize: "1.01em", color: "#217a54", lineHeight: "1.56" }}>
-                  {step.desc}
+                  Create your account and deposit funds (min ₹100).
                 </div>
               </div>
             </div>
-          ))}
+            <div style={{
+              padding: "28px 10px",
+              display: "flex", alignItems: "center", marginBottom: 20,
+              background: "#fff", borderRadius: 19, boxShadow: "0 2px 13px #2defe013", maxWidth: 670, marginLeft: "auto", marginRight: "auto"
+            }}>
+              <span style={{fontSize:"2.4em",marginRight:20}}>
+                <FaLock color="#ffbe23"/>
+              </span>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: "1.17em", marginBottom: 2, color: "#19373a" }}>
+                  Select Your Targeted Service
+                </div>
+                <div style={{ fontSize: "1.01em", color: "#217a54", lineHeight: "1.56" }}>
+                  Pick your social service from the order dashboard.
+                </div>
+              </div>
+            </div>
+            <div style={{
+              padding: "28px 10px",
+              display: "flex", alignItems: "center", marginBottom: 20,
+              background: "#fff", borderRadius: 19, boxShadow: "0 2px 13px #2defe013", maxWidth: 670, marginLeft: "auto", marginRight: "auto"
+            }}>
+              <span style={{fontSize:"2.4em",marginRight:20}}>
+                <FaWhatsapp color="#21e073"/>
+              </span>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: "1.17em", marginBottom: 2, color: "#19373a" }}>
+                  Provide Link, Quantity &amp; Watch Results!
+                </div>
+                <div style={{ fontSize: "1.01em", color: "#217a54", lineHeight: "1.56" }}>
+                  Paste details, preview pricing, and submit. Track, refill, refund, or chat with admin anytime.
+                </div>
+              </div>
+            </div>
         </div>
       </div>
 
@@ -231,57 +257,39 @@ export default function HomePage() {
         maxWidth: 410, margin: "0 auto 27px", padding: "26px 22px"
       }}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-          <img src="/social-icons/calc.png" alt="" style={{ width: 38, marginRight: 13 }} />
+          <span style={{fontSize:"2em",marginRight:13}}>🧾</span>
           <span style={{ fontWeight: 900, fontSize: "1.17em", color: "#184b39" }}>726724</span>
           <span style={{ marginLeft: 12, color: "#1f1f1f" }}>Total Orders</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-          <img src="/social-icons/dollar.png" alt="" style={{ width: 34, marginRight: 13 }} />
-          <span style={{ fontWeight: 900, fontSize: "1.1em", color: "#215991" }}>$0.001/1K</span>
+          <span style={{fontSize:"2em",marginRight:13}}>💸</span>
+          <span style={{ fontWeight: 900, fontSize: "1.10em", color: "#215991" }}>$0.001/1K</span>
           <span style={{ marginLeft: 12, color: "#1f1f1f" }}>Starting Price</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-          <img src="/social-icons/support.png" alt="" style={{ width: 34, marginRight: 13 }} />
+          <span style={{fontSize:"2em",marginRight:13}}>💬</span>
           <span style={{ fontWeight: 900, fontSize: "1.11em", color: "#32cc69" }}>24/7</span>
           <span style={{ marginLeft: 12, color: "#1f1f1f" }}>Fastest Support</span>
         </div>
         <div style={{ display: "flex", alignItems: "center"}}>
-          <img src="/social-icons/party.png" alt="" style={{ width: 34, marginRight: 13 }} />
+          <span style={{fontSize:"2em",marginRight:13}}>🎉</span>
           <span style={{ fontWeight: 900, fontSize: "1.11em", color: "#cc32b2" }}>3058+</span>
           <span style={{ marginLeft: 12, color: "#1f1f1f" }}>Happy Clients</span>
         </div>
       </div>
 
-      {/* Best SMM / Rocket / Services */}
-      <div style={{
-        background: "linear-gradient(90deg,#fefd8b 10%,#2cfcb1 100%)",
-        borderRadius:"32px", maxWidth:900, margin:"32px auto 32px", boxShadow:"0 0 44px #41ffd711", padding:"18px 17px 27px"
-      }}>
-        <div style={{display:"flex", flexWrap:"wrap", alignItems:"center",gap:23,justifyContent:"center"}}>
-          <img src="/rocket-hero.png" alt="" style={{
-            width:80, height:80, borderRadius:"50%", boxShadow:"0 1px 12px #e9e9ee", background:"#fff"
-          }} />
-          <div>
-            <h3 style={{margin:"9px 0 7px 0",color:"#1fad59",fontWeight:900,fontSize:"1.17em"}}>Best SMM Panel For Resellers</h3>
-            <div style={{fontWeight:600,fontSize:"1.06em",marginBottom:7, color:"#2d363a"}}>
-              Cheapest, top-rated Indian reseller SMM panel. Wallet from ₹100, full analytics.<br/>
-            </div>
-            <Link style={{
-              color:"#fff", background:"linear-gradient(90deg,#ff9107,#13d596)", borderRadius:14, padding:"12px 31px",
-              fontWeight:700, fontSize:"1.05em", textDecoration:"none", boxShadow:"0 2px 12px #39e4b825"
-            }} to="/signup">Create Account</Link>
-          </div>
-        </div>
-        {/* Big Circular Service Grid */}
+      {/* Services Grid: SVG Icons */}
+      <div style={{ maxWidth:900, margin:"53px auto 32px",textAlign:"center" }}>
+        <h2 style={{ fontWeight:900, fontSize:"2em", marginBottom:8 }}>Top SMM Services We Provide</h2>
         <div style={{
-          display:"flex",flexWrap:"wrap",justifyContent:"center",gap:18,marginTop:23
+          display:"flex",flexWrap:"wrap",justifyContent:"center",gap:22,marginTop:13
         }}>
-          {["instagram","facebook","youtube","telegram","twitter","tiktok","linkedin","discord","web"].map((name) =>
-            <div key={name} style={{
-              width:59,height:59,borderRadius:36,display:"flex",alignItems:"center",justifyContent:"center",
-              background:"#f8ffff", boxShadow:"0 0 10px #1affed10", margin:"3px"
+          {socialServices.map(({label,icon,bg}) =>
+            <div key={label} style={{
+              width:64, height:64, borderRadius:32, background: bg,
+              display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 0 11px #22ffee08", margin:"2px"
             }}>
-              <img src={`/social-icons/${name}.png`} style={{width:34,height:34}} alt={name}/>
+              <span style={{fontSize:"2em"}} title={label}>{icon}</span>
             </div>
           )}
         </div>
