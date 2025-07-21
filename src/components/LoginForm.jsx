@@ -11,10 +11,6 @@ export default function LoginForm() {
   async function handleSubmit(e) {
     e.preventDefault();
     setErr("");
-    if (!email || !password) {
-      setErr("❌ Please enter both email and password.");
-      return;
-    }
     setLoading(true);
     try {
       const auth = getAuth(app);
@@ -28,12 +24,21 @@ export default function LoginForm() {
 
   return (
     <form className="login-form" onSubmit={handleSubmit}>
-      <input type="email" className="login-input"
+      <input
+        type="email"
+        className="login-input"
         placeholder="📧 Email"
-        value={email} onChange={e => setEmail(e.target.value)} autoFocus />
-      <input type="password" className="login-input"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        autoFocus
+      />
+      <input
+        type="password"
+        className="login-input"
         placeholder="🔑 Password"
-        value={password} onChange={e => setPassword(e.target.value)} />
+        value={password}
+        onChange={e => setPassword(e.target.value)}
+      />
       {err && <div className="form-error">{err}</div>}
       <button className="login-btn-green" disabled={loading}>
         {loading ? "Signing in..." : "Sign in"}
