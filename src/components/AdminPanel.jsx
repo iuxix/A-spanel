@@ -1,163 +1,130 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import {
+  collection, getDocs, updateDoc, deleteDoc, doc, setDoc
+} from "firebase/firestore";
 
 export default function AdminPanel() {
-  const [services, setServices] = useState([]);
-  const [newItem, setNewItem] = useState({
-    title:"", cat:"", desc:"", avgtime:"", min:"", max:"", price:""
-  });
-  const [err, setErr] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [funds, setFunds] = useState([]);
+  const [qr, setQr] = useState("");
+  const [qrInput, setQrInput] = useState("");
+  const [qrSaved, setQrSaved] = useState("");
 
-  // Load all services on mount
+  // Load fund requests and current QR image on mount
   useEffect(() => {
-    getDocs(collection(db, "services")).then(svs => {
-      setServices(svs.docs.map(doc => ({id: doc.id, ...doc.data()})));
+    getDocs(collection(db, "deposits")).then(ps =>
+      setFunds(ps.docs.map(d => ({ id: d.id, ...d.data() })))
+    );
+    getDocs(collection(db, "settings")).then(snap => {
+      const docSet = snap.docs.find(d => d.id === "general");
+      if (docSet && docSet.data().fundQR) {
+        setQr(docSet.data().fundQR);
+        setQrInput(docSet.data().fundQR);
+      }
     });
   }, []);
 
-  // Inline editing and delete
-  async function handleEdit(id, field, e) {
-    const value = e.target.value;
-    setServices(svcs => svcs.map(svc => svc.id === id ? {...svc, [field]: value} : svc));
-    await updateDoc(doc(db, "services", id), {
-      [field]: ["price", "min", "max"].includes(field)
-        ? (field === "price" ? parseFloat(value) : parseInt(value) || 0)
-        : value
-    });
-  }
-  async function handleDelete(id) {
-    await deleteDoc(doc(db,"services",id));
-    setServices(svs => svs.filter(s => s.id !== id));
+  // Accept: remove from list, update user balance (example only here), remove from Firestore
+  async function handleAction(f, action) {
+    if (action === "accept") {
+      // (In production: increment user balance here)
+      await deleteDoc(doc(db, "deposits", f.id));
+      setFunds(funds => funds.filter(x => x.id !== f.id));
+      // Optional: show notification
+    }
+    if (action === "reject") {
+      await deleteDoc(doc(db, "deposits", f.id));
+      setFunds(funds => funds.filter(x => x.id !== f.id));
+    }
   }
 
-  // Add new service (with validation)
-  async function addService(e) {
+  // Save QR
+  async function handleQrSave(e) {
     e.preventDefault();
-    setErr("");
-    setLoading(true);
-    for (const k of ["title","cat","desc","avgtime","min","max","price"]) {
-      if (!newItem[k] && newItem[k] !== 0) {
-        setErr(`Please fill "${k.charAt(0).toUpperCase()+k.slice(1)}"`);
-        setLoading(false);
-        return;
-      }
-    }
-    if (isNaN(Number(newItem.min)) || isNaN(Number(newItem.max)) || isNaN(Number(newItem.price))) {
-      setErr("Min, Max, and Price must be numbers.");
-      setLoading(false);
-      return;
-    }
-    try {
-      const added = await addDoc(collection(db,"services"),{
-        ...newItem,
-        min: parseInt(newItem.min,10),
-        max: parseInt(newItem.max,10),
-        price: parseFloat(newItem.price)
-      });
-      setServices([...services, {id: added.id, ...newItem}]);
-      setNewItem({title:"", cat:"", desc:"", avgtime:"", min:"", max:"", price:""});
-    } catch (e) {
-      setErr("Failed to add: "+(e.message||"unknown error"));
-    }
-    setLoading(false);
+    await setDoc(doc(db, "settings", "general"), { fundQR: qrInput }, { merge: true });
+    setQr(qrInput);
+    setQrSaved("URL saved!");
+    setTimeout(() => setQrSaved(""), 1200);
   }
 
   return (
     <div style={{
-      maxWidth: 1060, margin: "36px auto", background: "#fff",
-      borderRadius: 18, boxShadow: "0 6px 24px #cdf6ff26", padding: "35px 16px"
+      maxWidth: 900, margin: "36px auto",
+      background: "#fff", borderRadius: 17,
+      boxShadow: "0 6px 24px #cdf6fa29",
+      color: "#173e26",
+      padding: "37px 20px"
     }}>
-      <h2 style={{
-        fontWeight: 800, fontSize: "1.37em",
-        margin: "0 0 22px 0", color: "#213046", letterSpacing: "-.5px"
-      }}>
-        <span role="img" aria-label="settings" style={{marginRight:7}}>⚙️</span>
-        Service Management
-      </h2>
+      {/* QR Management */}
+      <div style={{marginBottom:30}}>
+        <div style={{fontWeight:800,fontSize:"1.15em",marginBottom:7}}>
+          Change Add Funds <span style={{color:"#13b08e"}}>QR/URL</span>
+        </div>
+        <form onSubmit={handleQrSave} style={{display:"flex",alignItems:"center",gap:13,flexWrap:"wrap"}}>
+          <input
+            value={qrInput}
+            onChange={e => setQrInput(e.target.value)}
+            placeholder="Paste UPI QR/URL here"
+            style={{
+              borderRadius:8,padding:"12px",border:"1.2px solid #e2ebf4",
+              fontSize:"1.11em",width:320,maxWidth:"94%"
+            }}
+          />
+          <button type="submit" style={{
+            background:"linear-gradient(90deg,#f8ac44,#18e887)",
+            color:"#fff", fontWeight:700, border:"none",borderRadius:9,
+            padding:"11px 24px",fontSize:"1.10em",cursor:"pointer"
+          }}>{qrSaved ? qrSaved : "Save"}</button>
+        </form>
+        {qr && (
+          <img src={qr} alt="UPI QR" style={{
+            display:"block",height:92,borderRadius:10,margin:"14px 0 3px 0",background:"#f5faf7",objectFit:"contain"
+          }}/>
+        )}
+      </div>
 
-      <table style={{width: "100%", borderSpacing: 0, marginBottom: "18px"}}>
-        <thead>
-          <tr style={{background: "#f3f6fb", fontWeight: 700}}>
-            <th style={th}>Title</th>
-            <th style={th}>Category</th>
-            <th style={th}>Description</th>
-            <th style={th}>Avg Time</th>
-            <th style={th}>Min</th>
-            <th style={th}>Max</th>
-            <th style={th}>Price</th>
-            <th style={th}>Del</th>
-          </tr>
-        </thead>
-        <tbody>
-          {services.map(s =>
-            <tr key={s.id}>
-              <td style={td}>
-                <input value={s.title} onChange={e=>handleEdit(s.id,"title",e)} style={input}/>
-              </td>
-              <td style={td}>
-                <input value={s.cat} onChange={e=>handleEdit(s.id,"cat",e)} style={input}/>
-              </td>
-              <td style={td}>
-                <input value={s.desc} onChange={e=>handleEdit(s.id,"desc",e)} style={input}/>
-              </td>
-              <td style={td}>
-                <input value={s.avgtime} onChange={e=>handleEdit(s.id,"avgtime",e)} style={input}/>
-              </td>
-              <td style={td}>
-                <input type="number" value={s.min} onChange={e=>handleEdit(s.id,"min",e)} style={input}/>
-              </td>
-              <td style={td}>
-                <input type="number" value={s.max} onChange={e=>handleEdit(s.id,"max",e)} style={input}/>
-              </td>
-              <td style={td}>
-                <input type="number" value={s.price} onChange={e=>handleEdit(s.id,"price",e)} style={input}/>
-              </td>
-              <td style={td}>
-                <button
-                  onClick={()=>handleDelete(s.id)}
-                  style={{color:"#e34a15",background:"none",border:"none",fontWeight:700,fontSize:"1.2em",cursor:"pointer",padding:0}}
-                  title="Delete"
-                >✕</button>
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-
-      <form onSubmit={addService} style={{
-        display: "flex", flexWrap: "wrap", gap: 9, alignItems: "flex-end", marginBottom: 5
-      }}>
-        <input placeholder="Title" value={newItem.title} onChange={e=>setNewItem(i=>({...i,title:e.target.value}))} style={input}/>
-        <input placeholder="Category" value={newItem.cat} onChange={e=>setNewItem(i=>({...i,cat:e.target.value}))} style={input}/>
-        <input placeholder="Description" value={newItem.desc} onChange={e=>setNewItem(i=>({...i,desc:e.target.value}))} style={input}/>
-        <input placeholder="Avg Time" value={newItem.avgtime} onChange={e=>setNewItem(i=>({...i,avgtime:e.target.value}))} style={input}/>
-        <input placeholder="Min" type="number" value={newItem.min} onChange={e=>setNewItem(i=>({...i,min:e.target.value}))} style={input}/>
-        <input placeholder="Max" type="number" value={newItem.max} onChange={e=>setNewItem(i=>({...i,max:e.target.value}))} style={input}/>
-        <input placeholder="Price" type="number" value={newItem.price} onChange={e=>setNewItem(i=>({...i,price:e.target.value}))} style={input}/>
-        <button
-          className="btn-main"
-          type="submit"
-          disabled={loading}
-          style={{
-            padding: "13px 38px", fontWeight: 700, fontSize: "1.11em", borderRadius: 12,
-            background: "linear-gradient(90deg,#21e073,#fbaf09 97%)", color: "#fff", border: "none",
-            marginLeft:5, minWidth:120, cursor: loading ? "not-allowed" : "pointer"
-          }}
-        >
-          {loading ? "Creating..." : "Create Service"}
-        </button>
-      </form>
-      {err && <div style={{color:"#e84a5b",fontWeight:700,margin:"7px 0 0 4px"}}>{err}</div>}
+      {/* Payment Requests */}
+      <div>
+        <h2 style={{fontWeight:700, fontSize:"1.12em", marginBottom:15}}>Pending Fund Requests</h2>
+        <div style={{
+          background:"#f8fcff",borderRadius:12,padding:"10px 6px",margin:"1px 0 0 0"
+        }}>
+          {funds.length === 0 &&
+            <div style={{color:"#bbb",padding:"14px 0", textAlign:"center"}}>No fund requests.</div>
+          }
+          {funds.map((f) => (
+            <div key={f.id}
+              style={{
+                margin:"0 0 17px 0", padding:"18px 16px 13px", borderRadius:8,
+                background: "#fff", boxShadow:"0 1.5px 8px #e2f7ec1e",
+                display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10
+              }}>
+              <div>
+                <div><strong>Amount:</strong> <span style={{color:"#159d40",fontWeight:800}}>{f.amount} INR</span></div>
+                <div>{f.proof && (
+                  <a href={f.proof} target="_blank" rel="noreferrer" style={{fontWeight:600,color:"#25aeeb",textDecoration:"underline"}}>View Proof</a>
+                )}</div>
+              </div>
+              <div style={{display:"flex",gap:11}}>
+                <button onClick={()=>handleAction(f,"accept")}
+                  style={{
+                    background:"linear-gradient(90deg,#18e417,#bee83f)",color:"#144c22",
+                    border:"none",borderRadius:8,fontWeight:700,padding:"10px 25px",fontSize:".99em",cursor:"pointer"
+                  }}>
+                  Accept
+                </button>
+                <button onClick={()=>handleAction(f,"reject")}
+                  style={{
+                    background:"linear-gradient(90deg,#ff3131,#fac356)",color:"#fff",
+                    border:"none",borderRadius:8,fontWeight:700,padding:"10px 18px",fontSize:".99em",cursor:"pointer"
+                  }}>
+                  Reject
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
-
-// Inline style helpers
-const input = {
-  fontWeight: 500, fontSize: ".99em", borderRadius: 7, border: "1.1px solid #eaeaea",
-  background: "#f8fcff", padding: "7px 11px", marginBottom: 3, minWidth: 67, maxWidth: 120
-};
-const td = {padding: "6px 7px"};
-const th = {padding: "8px 10px", textAlign: "left", fontSize: "1em", background:"#f6fafd"};
