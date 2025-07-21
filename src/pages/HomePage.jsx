@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+const LOGO_SRC = "/logo.png";
+
 export default function HomePage() {
   return (
     <div style={{
@@ -14,12 +16,35 @@ export default function HomePage() {
         borderBottom: "1px solid #eef5fb",
         padding: "26px 0 19px 0",
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        position:"sticky",top:0,zIndex:100
+        position:"sticky",top:0,zIndex:100,
       }}>
         <div style={{
-          fontWeight: 900, color: "#16b687",
-          fontSize: "2em", marginLeft: 24, letterSpacing: "1.2px", fontFamily: "Poppins,sans-serif"
+          fontWeight: 900,
+          color: "#16b687",
+          fontSize: "2em",
+          marginLeft: 24,
+          letterSpacing: "1.2px",
+          fontFamily: "Poppins,sans-serif",
+          display: "flex",
+          alignItems: "center"
         }}>
+          {/* Auto logo on left */}
+          <img
+            src={LOGO_SRC}
+            alt="LuciXFire Panel Logo"
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: "50%",
+              marginRight: 15,
+              objectFit: "cover",
+              boxShadow: "0 2px 16px #1de88511"
+            }}
+            onError={e => {
+              e.target.onerror = null;
+              e.target.src = "https://ui-avatars.com/api/?background=16b687&color=fff&bold=true&name=L+F";
+            }}
+          />
           LuciXFire Panel
         </div>
         <div style={{marginRight:20, display:"flex", gap:13}}>
@@ -135,8 +160,6 @@ export default function HomePage() {
               fontWeight: 600,
               outline: "none"
             }} autoComplete="current-password"/>
-          {/* Error message here if needed:
-          <div style={{color:"#fa3c53",fontWeight:700,textAlign:"center"}}>❌ Invalid password</div>*/}
           <button type="button" style={{
             background: "linear-gradient(90deg,#19f477,#0aa06b 97%)",
             color: "#fff",
