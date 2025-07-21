@@ -114,3 +114,14 @@ input, select, textarea {
 .main-btn.dark   { background: linear-gradient(92deg,#953fee,#145eae 100%); color: #fff; }
 .main-btn:hover  { filter: brightness(1.09);}
 }
+.auth-bg { min-height:100vh; display:flex; flex-direction:column; align-items:center; background:linear-gradient(120deg,#edfcf7,#f6faff); }
+.auth-container { max-width:430px; margin:54px auto 0 auto; background:#fff; box-shadow:0 7px 32px #d4fcff19; padding:44px 36px 36px 36px; border-radius:22px; }
+.login-title { font-size:1.36em; font-weight:800; margin-bottom:13px; text-align:center; }
+.login-form { display:flex; flex-direction:column; gap:15px; }
+.login-input { padding:15px 14px; font-size:1.08em; border-radius:11px; border:1.8px solid #e2f3f5; background:#f8fcfc; }
+.login-btn-green { background:linear-gradient(90deg,#25fa7c,#ffd835 110%); color:#144b3c; font-weight:800; border:none; border-radius:10px; padding:12px 0; margin-top:2px; cursor:pointer; }
+.login-btn-green:disabled { opacity:0.6; }
+.form-error { color:#e23a56; font-weight:700; }
+.login-links { margin-top:10px; font-size:.99em; text-align:center; }
+.forgot-link { color:#2756f4;}
+}
