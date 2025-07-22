@@ -25,7 +25,7 @@ export default function Dashboard() {
             display:"flex",alignItems:"center",background:"#f5fff6",padding:"7px 21px",
             borderRadius:18,fontWeight:800,color:"#128c5b",fontSize:"1.11em",boxShadow:"0 1px 6px #19f98f1c"
           }}><FaWallet style={{marginRight:6}}/>₹1,500.00</span>
-          <img src="/profile.jpg" alt="Me" style={{height:42,borderRadius:"50%",boxShadow:"0 2px 16px #2ef8e115"}} />
+          <img src="/logo.png" alt="Me" style={{height:42,borderRadius:"50%",boxShadow:"0 2px 16px #2ef8e115"}} />
         </div>
       </nav>
       
