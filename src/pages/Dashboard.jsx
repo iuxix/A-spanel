@@ -5,7 +5,7 @@ import { db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 
 // ---- CONFIG ----
-const PANEL_NAME = "fastsmmpanel";
+const PANEL_NAME = "LucixFire Panel";
 const PANEL_COLOR = "#2264f4";
 
 const CATEGORIES = [
