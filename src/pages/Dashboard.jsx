@@ -1,251 +1,196 @@
-import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { collection, onSnapshot, doc, getDoc, addDoc, updateDoc, query, where } from "firebase/firestore";
-import { db } from "../firebase";
+import React from "react";
+import { Link } from "react-router-dom";
+import {
+  FaWallet, FaWhatsapp, FaChartLine, FaRegUserCircle,
+  FaInstagram, FaFacebookF, FaYoutube, FaGlobe, FaTiktok, FaTelegramPlane,
+} from "react-icons/fa";
 
 export default function Dashboard() {
-  const [user, setUser] = useState(null);
-  const [services, setServices] = useState([]);
-  const [balance, setBalance] = useState(0);
-  const [orderSuccess, setOrderSuccess] = useState("");
-  const [selected, setSelected] = useState(null);
-  const [qty, setQty] = useState("");
-  const [link, setLink] = useState("");
-  const [orderError, setOrderError] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  // Listen to logged in user
-  useEffect(() => {
-    const auth = getAuth();
-    return onAuthStateChanged(auth, async (usr) => {
-      if (usr) {
-        setUser(usr);
-        // Real-time balance
-        onSnapshot(doc(db, "users", usr.uid), (docSnap) => {
-          setBalance(docSnap.exists() ? (docSnap.data().balance || 0) : 0);
-        });
-      }
-    });
-  }, []);
-
-  // Services loader
-  useEffect(() => {
-    const unsub = onSnapshot(collection(db, "services"), (snapshot) => {
-      setServices(
-        snapshot.docs.map((doc) => ({
-          id: doc.id, ...doc.data()
-        }))
-      );
-      setLoading(false);
-    });
-    return unsub;
-  }, []);
-
-  async function handleOrder(e) {
-    e.preventDefault();
-    setOrderError(""); setOrderSuccess("");
-    if (!selected || !qty || !link) {
-      setOrderError("❌ Please fill all fields."); return;
-    }
-    if (parseInt(qty) < selected.min || parseInt(qty) > selected.max) {
-      setOrderError("❌ Quantity: Min " + selected.min + " - Max " + selected.max); return;
-    }
-    const charge = ((selected.price * parseInt(qty)) / 1000);
-    if (charge > balance) {
-      setOrderError(`❌ Insufficient balance. Please add funds.`); return;
-    }
-    // Create order
-    await addDoc(collection(db, "orders"), {
-      user: user.uid,
-      service_id: selected.id,
-      qty: parseInt(qty),
-      link,
-      charge,
-      status: "pending",
-      timestamp: Date.now()
-    });
-    // Deduct balance
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: balance - charge
-    });
-    setOrderSuccess(`✅ Order placed: ${qty} x ${selected.title}`);
-    setQty(""); setLink(""); setSelected(null);
-  }
-
-  // Animate for balance and order cards
-  const cardAnim = { initial:{opacity:0,y:40}, animate:{opacity:1,y:0}, exit:{opacity:0,y:40}};
-  const secAnim = { initial:{opacity:0}, animate:{opacity:1}, exit:{opacity:0}};
-
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(109deg,#f4fff7 80%,#f1fbff 100%)",
-        padding: "0 10vw 60px 10vw"
-      }}
-    >
-      {/* Balance Section */}
-      <motion.div {...cardAnim} transition={{duration:0.5}} style={{
-        background: "#fff",
-        borderRadius: 19,
-        padding: "23px 32px",
-        maxWidth: 450,
-        margin: "35px auto 25px",
-        boxShadow: "0 6px 30px #33f69a13",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        fontWeight: 800,
-        fontSize: "1.27em"
+    <div style={{
+      background: "linear-gradient(100deg,#fafffc 65%,#eafcff 100%)",
+      minHeight: "100vh",
+      padding: "0 0 40px 0"
+    }}>
+      <nav style={{
+        background: "#fff", boxShadow:"0 2px 20px #e1f9f6", borderBottom:"1.4px solid #e8f7fb",
+        display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px 0 18px 0", position:"sticky", top:0, zIndex:40
       }}>
-        <div style={{color:"#1ac28b",display:"flex",alignItems:"center"}}>
-          <span style={{fontSize:"2em",marginRight:14}}>💰</span>
-          Balance
+        <div style={{display:"flex",alignItems:"center"}}>
+          <img src="/logo.png" alt="LuciXFire logo" style={{height:46, borderRadius:15,marginLeft:20,marginRight:11}} />
+          <span style={{fontWeight:900,fontSize:"2em", letterSpacing:"1px",color:"#13d89e"}}>LuciXFire Panel</span>
         </div>
-        <motion.span
-          key={balance}
-          initial={{ scale: 0.7, opacity: 0.7 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.4, type: "spring" }}
-          style={{
-            color: "#18bb47",
-            fontWeight: 900,
-            fontSize: "1.24em",
-            letterSpacing: 1.2,
-            minWidth: 100,
-            textAlign: "right"
-          }}
-        >
-          ₹{balance.toFixed(2)}
-        </motion.span>
-      </motion.div>
-
-      {/* Order Section */}
-      <motion.div {...cardAnim} transition={{duration:0.65}} style={{
-        background: "#fff",
-        borderRadius: 17,
-        maxWidth: 490,
-        margin: "0 auto 25px auto",
-        padding: "27px 18px 21px",
-        boxShadow: "0 8px 40px #cdfdf218",
-        position: "relative"
+        <div style={{display:"flex",alignItems:"center",marginRight:26,gap:13}}>
+          <span style={{
+            display:"flex",alignItems:"center",background:"#f5fff6",padding:"7px 21px",
+            borderRadius:18,fontWeight:800,color:"#128c5b",fontSize:"1.11em",boxShadow:"0 1px 6px #19f98f1c"
+          }}><FaWallet style={{marginRight:6}}/>₹1,500.00</span>
+          <img src="/profile.jpg" alt="Me" style={{height:42,borderRadius:"50%",boxShadow:"0 2px 16px #2ef8e115"}} />
+        </div>
+      </nav>
+      
+      {/* Welcome & Widgets */}
+      <div style={{
+        maxWidth:1200,margin:"0 auto",display:"flex",gap:26,flexWrap:"wrap",marginTop:30,justifyContent:"space-between"
       }}>
-        <h2 style={{
-          textAlign: "center", fontWeight: 900, fontSize: "1.25em", letterSpacing: "-1px", marginBottom: "19px"
-        }}>New Order <span role="img" aria-label="lightning">⚡</span></h2>
-        <form onSubmit={handleOrder} autoComplete="off" style={{display:"flex",flexDirection:"column",gap:13,alignItems:"stretch"}}>
-          <label>Service</label>
-          <select
-            value={selected ? selected.id : ""}
-            style={{
-              padding: "13px 10px", fontWeight: 600, fontSize: "1.07em", borderRadius: 12, border: "1.2px solid #e2efff",
-              background: "#f8ffff"
-            }}
-            onChange={e => {
-              const srv = services.find(s => s.id === e.target.value);
-              setSelected(srv || null);
-              setOrderError(""); setOrderSuccess("");
-            }}
-          >
-            <option value="">Select Service…</option>
-            {services.map(s => (
-              <option key={s.id} value={s.id}>{s.title} ({s.price}/1K)</option>
-            ))}
-          </select>
+        {/* Widget Column */}
+        <div style={{flex:"1 1 360px",minWidth:330,maxWidth:390}}>
+          <div style={{
+            background: "linear-gradient(103deg,#eaffdf 5%,#fbf8ff 100%)",
+            borderRadius:22, boxShadow:"0 4px 24px #b3ffe723", padding:"29px 21px",marginBottom:22
+          }}>
+            <div style={{fontWeight:900,fontSize:"1.2em",color:"#1e7647"}}>Welcome back 👋</div>
+            <div style={{margin:"14px 0",color:"#507234",fontWeight:700}}>
+              Username: <span style={{color:"#18adfd",fontWeight:600}}>MyUser123</span>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:12,marginTop:13}}>
+              <FaWallet color="#11d992" size={22}/> <b>Wallet Balance:</b>
+              <span style={{fontWeight:900,fontSize:"1.17em",color:"#04bc86"}}>₹1,500.00</span>
+            </div>
+            <div style={{marginTop:25,display:"flex",gap:12}}>
+              <Link to="/addfunds" style={ctaBtn("#ffbe23", "#13e97a")}>
+                + Add Funds
+              </Link>
+              <Link to="/support" style={ctaBtn("#55e3fd", "#11d9ab")}>
+                <FaWhatsapp style={{marginRight:5}}/> Support
+              </Link>
+            </div>
+          </div>
+          <div style={{
+            background:"linear-gradient(97deg,#ffe48e 4%,#bbfff0 90%)",
+            borderRadius:15,padding:"18px 18px 12px",marginBottom:17,boxShadow:"0 1px 12px #fedb5540"
+          }}>
+            <div style={{fontWeight:900,fontSize:"1.13em",color:"#fd8526"}}>Notice</div>
+            <div style={{color:"#4a734f",margin:"9px 0 5px"}}>UPI deposits must be ₹100+. DM support via WhatsApp for instant wallet updates.</div>
+          </div>
+        </div>
 
-          {selected && (
-            <motion.div {...secAnim} transition={{duration:0.3}}>
-              <div style={{fontSize:".98em",background:"#f7fdff",borderRadius:7,padding:"9px 10px",marginBottom:6}}>
-                <b>{selected.desc}</b><br/>
-                <span style={{color:"#25bc8b"}}>Min: {selected.min} – Max: {selected.max} | Est: {selected.avgtime}</span>
-              </div>
-            </motion.div>
-          )}
+        {/* Order/Actions/Main Card Column */}
+        <div style={{flex: "6 1 600px", minWidth:390, maxWidth:730, width:"100%"}}>
+          {/* Order Now Card */}
+          <div style={{
+            background:"linear-gradient(94deg,#fffaf7 5%,#e3fdff 97%)",
+            boxShadow:"0 2px 23px #bbfbef15",
+            borderRadius:22,padding:"29px 28px",marginBottom:28
+          }}>
+            <div style={{fontWeight:900,fontSize:"1.22em",color:"#12496e",marginBottom:13}}>New Order 🚀</div>
+            <form style={{display:"flex",flexWrap:"wrap",gap:22,alignItems:"center",marginBottom:7}}>
+              <select style={orderInput}>
+                <option>Instagram Followers</option>
+                <option>Facebook Likes</option>
+                <option>Telegram Subscribers</option>
+                <option>Tiktok Views</option>
+                <option>More...</option>
+              </select>
+              <input type="text" placeholder="Paste Link" style={orderInput}/>
+              <input type="number" placeholder="Quantity" style={orderInput}/>
+              <button style={{
+                ...ctaBtn("#21e073", "#fbaf09"),fontWeight:800,fontSize:"1.07em",marginTop:2
+              }}>Place Order</button>
+            </form>
+            <div style={{fontSize:".99em",color:"#158f6e",marginTop:3}}>
+              Minimum order: 10, Maximum: 100,000 | Average time: 10 minutes
+            </div>
+          </div>
+          
+          {/* Orders Table / History */}
+          <div style={{
+            background:"linear-gradient(90deg,#d0fffa 4%,#ffeec2 90%)",
+            borderRadius:22,padding:"22px 19px 13px",boxShadow:"0 1.8px 28px #34ede822",marginBottom:33
+          }}>
+            <div style={{fontWeight:900,fontSize:"1.12em",marginBottom:15,color:"#235e67"}}>Recent Orders</div>
+            <table style={{width:"100%",borderCollapse:"separate",borderSpacing:"0 8px"}}>
+              <thead>
+                <tr style={{fontWeight:700,color:"#23a565"}}>
+                  <th style={{paddingBottom:6}}>Order ID</th>
+                  <th>Service</th>
+                  <th>Qty</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <DashboardOrderRow oid="7845121" name="Instagram Followers" q={2000} dt="2024-07-20" st="Processing" color="#beb216"/>
+                <DashboardOrderRow oid="7845122" name="Telegram Members" q={500} dt="2024-07-20" st="Completed" color="#37c96a"/>
+                <DashboardOrderRow oid="7845123" name="YT Likes" q={215} dt="2024-07-20" st="Refilled" color="#28bae3"/>
+                <DashboardOrderRow oid="7845124" name="FB Reactions" q={3050} dt="2024-07-20" st="Cancelled" color="#e94c40"/>
+                {/* ...fetch more */}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-          <label>Link</label>
-          <input
-            type="text"
-            placeholder="Paste post/profile link"
-            style={{
-              borderRadius: 10, padding: "13px 12px", border: "1.1px solid #e5eefe",
-              background: "#fafdff", fontSize: "1.07em"
-            }}
-            value={link}
-            onChange={e => setLink(e.target.value)}
-          />
-          <label>Quantity</label>
-          <input
-            type="number"
-            placeholder="Enter quantity"
-            style={{
-              borderRadius: 10, padding: "13px 12px", border: "1.1px solid #e5eefe",
-              background: "#fafdff", fontSize: "1.07em"
-            }}
-            value={qty}
-            min={selected?.min}
-            max={selected?.max}
-            onChange={e => setQty(e.target.value)}
-          />
-
-          {/* Charge */}
-          <motion.div
-            {...secAnim}
-            transition={{ duration: 0.23 }}
-            style={{
-              margin: "12px 0 14px 0",
-              color: "#27c65c",
-              fontWeight: 700,
-              fontSize: "1.08em",
-              textAlign: "right"
-            }}
-          >
-            Charge: ₹
-            {qty && selected
-              ? ((selected.price * Number(qty)) / 1000).toFixed(2)
-              : "0.00"}
-          </motion.div>
-
-          {/* Errors and Success */}
-          {orderError && <motion.div {...secAnim} transition={{duration:0.22}} style={{color:"#e94a64",fontWeight:710,textAlign:"center",marginBottom:6}}>{orderError}</motion.div>}
-          {orderSuccess && <motion.div {...secAnim} transition={{duration:0.22}} style={{color:"#12bf61",fontWeight:710,textAlign:"center",marginBottom:6}}>{orderSuccess}</motion.div>}
-
-          <motion.button
-            type="submit"
-            whileTap={{scale:0.96}}
-            style={{
-              background: "linear-gradient(90deg,#1ee083,#fbcf12 99%)",
-              color: "#fff", fontWeight: 900, fontSize: "1.13em",
-              border: "none", borderRadius: "12px", padding: "15px 0", marginTop:2,
-              cursor: "pointer", boxShadow: "0 2px 13px #30eacb16"
-            }}
-          >
-            Place Order
-          </motion.button>
-        </form>
-      </motion.div>
-
-      {/* Helpful Hints / Animated Stats (OPTIONAL) */}
-      <motion.div
-        {...cardAnim}
-        transition={{duration:0.6}}
-        style={{
-          maxWidth: 700,
-          margin: "38px auto 0",
-          padding: "25px 28px",
-          background: "#fff",
-          borderRadius: 18,
-          boxShadow: "0 5px 25px #bff8e40d",
-          display:"flex",
-          gap:32,
-          justifyContent:"space-evenly",
-          fontWeight:700,
-          fontSize:"1.09em"
+      {/* Services/Platforms Grid */}
+      <div style={{maxWidth:1100,margin:"29px auto 51px",textAlign:"center"}}>
+        <h2 style={{fontWeight:900, fontSize:"2em",marginBottom:12,letterSpacing:"-1px"}}>Available Platforms</h2>
+        <div style={{
+          display:"flex",flexWrap:"wrap",justifyContent:"center",gap:22,marginTop:10
         }}>
-        <motion.div animate={{y:[8,-8,8]}} transition={{duration:2,repeat:Infinity,type:"spring"}}>💰 Refill/bonus offers weekly</motion.div>
-        <motion.div animate={{y:[-7,7,-7]}} transition={{duration:2,repeat:Infinity,type:"spring",delay:0.4}}>🚀 Orders start instantly after admin approval</motion.div>
-        <motion.div animate={{y:[7,-7,7]}} transition={{duration:2,repeat:Infinity,type:"spring",delay:0.8}}>🔒 All wallet funds are secure & tracked</motion.div>
-      </motion.div>
+          {[
+            {label:"Instagram",icon:<FaInstagram color="#E4405F" />,bg:"#fff3f8"},
+            {label:"Facebook", icon:<FaFacebookF color="#0866FF"/>, bg:"#eaf5fd"},
+            {label:"YouTube",icon:<FaYoutube color="#FF0000"/>, bg:"#fff5ee"},
+            {label:"Telegram",icon:<FaTelegramPlane color="#229ED9"/>, bg:"#eaf8ff"},
+            {label:"Tiktok",icon:<FaTiktok color="#000"/>,bg:"#f7f7fa"},
+            {label:"LinkedIn",icon:<FaLinkedinIn color="#0A66C2"/>, bg:"#eef5fb"},
+            {label:"Discord",icon:<FaDiscord color="#5865F2"/>, bg:"#f6f4ff"},
+            {label:"Website Traffic",icon:<FaGlobe color="#2CC45C"/>, bg:"#f7fdf6"},
+          ].map(({label,icon,bg}) =>
+            <div key={label} style={{
+              width:68,height:68,borderRadius:34,background:bg,display:"flex",alignItems:"center",justifyContent:"center",
+              boxShadow:"0 1.5px 12px #12ecd91a",margin:"5px"
+            }}>
+              <span style={{fontSize:"2.2em"}} title={label}>{icon}</span>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
+
+function DashboardOrderRow({oid, name, q, dt, st, color}) {
+  // Custom colored status chip
+  return (
+    <tr style={{background:"#fff",borderRadius:13,boxShadow:"0 0 9px #05eeb911"}}>
+      <td style={{padding:"13px 5px",fontWeight:800,color:"#33959e"}}>#{oid}</td>
+      <td style={{padding:"13px 13px",fontWeight:700,color:"#204b76"}}>{name}</td>
+      <td style={{padding:"13px 5px",fontWeight:700,color:"#7943da"}}>{q}</td>
+      <td style={{padding:"13px 7px"}}>
+        <span style={{
+          display:"inline-block",minWidth:68,padding:"7px 20px",borderRadius:7,
+          fontWeight:800,background:color+"22",color,
+          fontSize:".97em",textShadow:"0 1px 8px #f8f8fa"
+        }}>{st}</span>
+      </td>
+      <td style={{padding:"13px 13px",fontWeight:500,color:"#5fa658",fontSize:".97em"}}>{dt}</td>
+    </tr>
+  );
+}
+
+function ctaBtn(start, end) {
+  return {
+    background: `linear-gradient(90deg,${start},${end})`,
+    color: "#fff",
+    borderRadius: "14px",
+    fontWeight: 800,
+    fontSize: "1.09em",
+    textDecoration: "none",
+    border: "none",
+    padding: "12px 30px",
+    boxShadow: "0 2px 16px #16eeb61a"
+  };
+}
+
+const orderInput = {
+  borderRadius: "10px",
+  border: "1.5px solid #e2ebf9",
+  background: "#fafdff",
+  fontWeight: 600,
+  color: "#1e3554",
+  fontSize: "1.08em",
+  padding: "14px 14px",
+  flex: "1 1 140px",
+  minWidth:100
+};
