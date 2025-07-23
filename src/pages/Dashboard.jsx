@@ -280,5 +280,18 @@ function AddFundsModal({ user, onClose }) {
           width: "100%", marginBottom: 13
         }} onChange={e => setProof(e.target.files[0])} />
         <button
-          style={{
-            width: "100%", borderRadius: 8, background: "linear-gradient(90deg,#ffc62f,#
+  style={{
+    width: "100%",
+    borderRadius: 8,
+    background: "linear-gradient(90deg,#ffc62f,#1cec86 100%)",
+    color: "#131d33",
+    fontWeight: 900,
+    fontSize: "1.12em",
+    padding: "13px 0",
+    border: "none",
+    marginBottom: 8
+  }}
+  type="submit"
+>
+  Submit
+</button>
