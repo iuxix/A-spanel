@@ -293,5 +293,4 @@ function AddFundsModal({ user, onClose }) {
   }}
   type="submit"
 >
-  Submit
-</button>
+
