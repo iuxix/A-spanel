@@ -7,7 +7,6 @@ import {
   FaCogs, FaUserCircle, FaHistory, FaWhatsapp, FaMoon, FaSun, FaPowerOff
 } from "react-icons/fa";
 
-// Categories & Services
 const categories = [
   { value: "new-ig", label: "⭐ New IG Services 😎⭐" },
   { value: "ig-followers-new", label: "IG Followers New" },
@@ -15,23 +14,23 @@ const categories = [
 ];
 const services = {
   "new-ig": [
-    { id: "1572", title: "Instagram Reels Views [ NoN~Drop | Emergency Working Update | 10M/Day | Lifetime ]", badge: "1572", badgeColor: "#0cb2ed", desc: "Start: Instant\nSpeed: 10M/Day\nDrop: No\nREFILL: Lifetime", avgtime: "3 hours", min: 100, max: 1000000, price: 0.13 }
+    { id: "1572", title: "Instagram Reels Views [NoN~Drop | 10M/Day]", badge: "1572", badgeColor: "#0cb2ed", desc: "Start: Instant\nSpeed: 10M/Day", avgtime: "3 hours", min: 100, max: 1000000, price: 0.13 }
   ],
   "ig-followers-new": [
-    { id: "10571", title: "Instagram Followers Old Accounts With Posts | Max 1M | 365 Days Refill", badge: "10571", badgeColor: "#619bf1", desc: "Quality: Old Accounts\nRefill: 365 Days Refill ♻️", avgtime: "5 hours", min: 100, max: 1000000, price: 121.5 },
-    { id: "10572", title: "Instagram Followers Old Accounts With Posts | Max 1M | Lifetime Refill", badge: "10572", badgeColor: "#619bf1", desc: "Quality: Old Accounts\nRefill: Lifetime Refill ♻️", avgtime: "7 hours", min: 100, max: 1000000, price: 121.5 }
+    { id: "10571", title: "Instagram Followers Old Accounts | 365 Days Refill", badge: "10571", badgeColor: "#619bf1", desc: "Quality: Old Accounts\nRefill: 365 Days", avgtime: "5 hours", min: 100, max: 1000000, price: 121.5 },
+    { id: "10572", title: "Instagram Followers Old Accounts | Lifetime Refill", badge: "10572", badgeColor: "#619bf1", desc: "Quality: Old Accounts\nRefill: Lifetime", avgtime: "7 hours", min: 100, max: 1000000, price: 121.5 }
   ],
   "telegram": [
-    { id: "3011", title: "Telegram Post Views Auto", badge: "TG", badgeColor: "#15b6f1", desc: "Instant delivery, non drop", avgtime: "1 hour", min: 100, max: 4000000, price: 0.02 }
+    { id: "3011", title: "Telegram Post Views Auto", badge: "TG", badgeColor: "#15b6f1", desc: "Instant, non drop", avgtime: "1 hour", min: 100, max: 4000000, price: 0.02 }
   ]
 };
-
-// Theme Colors & Accents
-const primaryColor = "#1b365d";      // Deep Blue
-const secondaryColor = "#2b539f";    // Soft Blue
-const accentColor = "#54c7ec";       // Light Cyan
-const textLight = "#f0f8ff";
-const textDark = "#12243a";
+const primaryColor = "#193357";
+const secondaryColor = "#2474df";
+const accentColor = "#36c2ff";
+const menuBg = "#f3f8fb";
+const menuBgDark = "#1a355d";
+const menuTextColor = "#193357";
+const menuTextHighlight = "#228edc";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -49,7 +48,6 @@ export default function Dashboard() {
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [orders, setOrders] = useState([]);
-  const [funds, setFunds] = useState([]);
   const [search, setSearch] = useState("");
   const [loadingFundsSubmit, setLoadingFundsSubmit] = useState(false);
 
@@ -58,15 +56,8 @@ export default function Dashboard() {
     const unsub = onAuthStateChanged(auth, usr => {
       setUser(usr);
       if (usr) {
-        // Wallet Balance
-        onSnapshot(doc(db, "users", usr.uid), d => {
-          setBalance(d.exists() && d.data().balance ? d.data().balance : 0);
-        });
-        // Funds
-        onSnapshot(query(collection(db, "deposits"), where("user", "==", usr.uid)), snap =>
-          setFunds(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => b.created?.toMillis?.() - a.created?.toMillis?.()))
-        );
-        // Orders
+        onSnapshot(doc(db, "users", usr.uid), d =>
+          setBalance(d.exists() && d.data().balance ? d.data().balance : 0));
         onSnapshot(query(collection(db, "orders"), where("user", "==", usr.uid)), snap =>
           setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => b.timestamp - a.timestamp))
         );
@@ -92,11 +83,11 @@ export default function Dashboard() {
   async function submitOrder(e) {
     e.preventDefault();
     setOrderMsg("");
-    if (!svc || !qty || !link) return setOrderMsg("❌ Please fill in all required fields.");
+    if (!svc || !qty || !link) return setOrderMsg("❌ Fill every field.");
     const q = parseInt(qty, 10);
-    if (isNaN(q) || q < svc.min || q > svc.max) return setOrderMsg(`❌ Quantity must be between ${svc.min} and ${svc.max}.`);
-    if (parseFloat(charge) > parseFloat(balance)) return setOrderMsg("❌ Insufficient balance. Please add funds.");
-    if (!user) return setOrderMsg("❌ Please log in to place order.");
+    if (isNaN(q) || q < svc.min || q > svc.max) return setOrderMsg(`❌ Quantity: ${svc.min} - ${svc.max}`);
+    if (parseFloat(charge) > parseFloat(balance)) return setOrderMsg("❌ Not enough balance.");
+    if (!user) return setOrderMsg("❌ Login required.");
     try {
       await addDoc(collection(db, "orders"), {
         user: user.uid,
@@ -109,13 +100,10 @@ export default function Dashboard() {
         cat,
         serviceTitle: svc.title
       });
-      setOrderMsg("✅ Order placed successfully! Track orders in My Orders menu.");
-      setSvc(null);
-      setLink("");
-      setQty("");
-      setCharge("0.00");
-    } catch (err) {
-      setOrderMsg("❌ Failed to place order. Please try again.");
+      setOrderMsg("✅ Order placed! Track it in My Orders.");
+      setSvc(null); setLink(""); setQty(""); setCharge("0.00");
+    } catch {
+      setOrderMsg("❌ Failed. Try again.");
     }
   }
 
@@ -124,7 +112,7 @@ export default function Dashboard() {
       if (newName) await updateProfile(getAuth().currentUser, { displayName: newName });
       if (newMail) await getAuth().currentUser.updateEmail(newMail);
       if (newPass) await getAuth().currentUser.updatePassword(newPass);
-      setInfoMsg("✅ Profile updated successfully!");
+      setInfoMsg("✅ Profile updated.");
     } catch (err) {
       setInfoMsg("❌ " + err.message);
     }
@@ -134,10 +122,10 @@ export default function Dashboard() {
     signOut(getAuth()).then(() => { window.location = "/"; });
   }
 
-  // AddFundsModal submission handler for fixed "Add Funds" modal with QR & steps
+  // FIXED AddFunds Modal Submit with success/error message
   async function handleAddFundsSubmit(amount, setMsg, resetInput) {
     setMsg("");
-    if (!amount || Number(amount) < 30) return setMsg("❌ Please enter at least ₹30.");
+    if (!amount || Number(amount) < 30) return setMsg("❌ Enter at least ₹30.");
     setLoadingFundsSubmit(true);
     try {
       await addDoc(collection(db, "deposits"), {
@@ -147,10 +135,10 @@ export default function Dashboard() {
         status: "pending",
         created: new Date()
       });
-      setMsg("✅ Fund request sent! Await admin approval.");
+      setMsg("✅ Request sent! Admin will process it soon.");
       resetInput();
     } catch {
-      setMsg("❌ Submission failed. Please try again.");
+      setMsg("❌ Submission failed. Try again.");
     }
     setLoadingFundsSubmit(false);
   }
@@ -158,22 +146,21 @@ export default function Dashboard() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: theme === "dark" ? primaryColor : "#fefefe",
-      color: theme === "dark" ? textLight : textDark,
-      fontFamily: "'Poppins', sans-serif",
-      transition: "background-color 0.3s ease, color 0.3s ease",
-      position: "relative",
-      paddingBottom: 60
+      paddingBottom: 70,
+      background: theme === "dark" ? primaryColor : "#f9fbfe",
+      color: theme === "dark" ? "#f5faff" : "#22334c",
+      fontFamily: "Poppins, sans-serif",
+      position: "relative"
     }}>
       {/* NAVBAR */}
       <nav style={{
         background: theme === "dark" ? secondaryColor : "#fff",
         borderBottom: `2px solid ${accentColor}`,
-        boxShadow: "0 3px 12px rgba(43,83,159,0.15)",
+        boxShadow: "0 1px 12px #1a255a0c",
         padding: "16px 0"
       }}>
         <div style={{
-          maxWidth: 600,
+          maxWidth: 650,
           margin: "0 auto",
           display: "flex",
           alignItems: "center",
@@ -182,74 +169,65 @@ export default function Dashboard() {
           <div style={{
             color: accentColor,
             fontWeight: 900,
-            fontSize: "1.42em",
-            letterSpacing: 1.2,
+            fontSize: "1.45em",
             display: "flex",
             alignItems: "center",
             gap: 14
           }}>
-            <img src="/logo.png" alt="LucixFire Logo" style={{ height: 38, borderRadius: "50%", background: "transparent" }} />
+            <img src="/logo.png" alt="Logo" style={{ height: 38, borderRadius: 22 }} />
             LucixFire Panel
           </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 17 }}>
             <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              aria-label="Toggle theme"
               title="Toggle Theme"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               style={{
-                color: theme === "dark" ? "#ffeb3b" : "#0c4fcc",
-                fontSize: "1.4em",
+                color: theme === "dark" ? "#ffd700" : "#2474df",
+                fontSize: "1.3em",
                 background: "none",
                 border: "none",
-                cursor: "pointer",
-                padding: 8,
-                userSelect: "none"
+                cursor: "pointer"
               }}
             >
               {theme === "dark" ? <FaSun /> : <FaMoon />}
             </button>
-
-            <img src="/logo.png" alt="User Avatar" style={{ height: 36, width: 36, borderRadius: "50%" }} />
-
+            <img src="/logo.png" alt="User Avatar" style={{ height: 32, width: 32, borderRadius: "50%" }} />
             <div style={{ position: "relative" }}>
               <button
                 onClick={() => setShowMenu(m => !m)}
-                aria-label="Open menu"
-                title="Menu"
+                aria-label="Menu"
                 style={{
-                  background: "none",
-                  border: "none",
-                  color: theme === "dark" ? "#a9dfff" : "#064f91",
-                  fontSize: "1.6em",
-                  padding: "6px 14px",
-                  borderRadius: 18,
+                  background: theme === "dark" ? menuBgDark : menuBg,
+                  border: "1px solid #aecbeb",
+                  color: theme === "dark" ? "#fff" : menuTextColor,
+                  fontSize: "1.52em",
+                  padding: "7px 12px",
+                  borderRadius: 20,
                   cursor: "pointer",
                   outline: showMenu ? `2px solid ${accentColor}` : "none",
-                  userSelect: "none",
-                  transition: "color 0.3s"
+                  transition: "background 0.2s, color 0.2s"
                 }}
-              ><FaEllipsisV /></button>
-
+              >
+                <FaEllipsisV />
+              </button>
               {showMenu && (
                 <div
-                  role="menu"
                   style={{
-                    background: theme === "dark" ? "#164073" : "#f9fcff",
-                    borderRadius: 14,
+                    background: theme === "dark" ? menuBgDark : menuBg,
+                    borderRadius: 17,
                     position: "absolute",
                     top: 40,
                     right: 0,
-                    boxShadow: "0 8px 23px rgba(34,97,151,0.25)",
+                    zIndex: 20,
                     minWidth: 180,
-                    zIndex: 30
+                    boxShadow: "0 6px 26px #2474df23"
                   }}
                 >
-                  <DropdownItem icon={<FaUserCircle />} label="Profile" onClick={() => { setShowProfile(true); setShowMenu(false); }} />
-                  <DropdownItem icon={<FaWallet />} label="Add Funds" onClick={() => { setShowFunds(true); setShowMenu(false); }} />
-                  <DropdownItem icon={<FaHistory />} label="My Orders" onClick={() => { setShowHistory(true); setShowMenu(false); }} />
-                  <DropdownItem icon={<FaCogs />} label="Settings" onClick={() => { setShowSettings(true); setShowMenu(false); }} />
-                  <DropdownItem icon={<FaPowerOff />} color="#d32f3e" label="Logout" onClick={handleLogout} />
+                  <DropdownItem theme={theme} icon={<FaUserCircle />} label="Profile" onClick={() => { setShowProfile(true); setShowMenu(false); }} />
+                  <DropdownItem theme={theme} icon={<FaWallet />} label="Add Funds" onClick={() => { setShowFunds(true); setShowMenu(false); }} />
+                  <DropdownItem theme={theme} icon={<FaHistory />} label="My Orders" onClick={() => { setShowHistory(true); setShowMenu(false); }} />
+                  <DropdownItem theme={theme} icon={<FaCogs />} label="Settings" onClick={() => { setShowSettings(true); setShowMenu(false); }} />
+                  <DropdownItem theme={theme} icon={<FaPowerOff />} color="#d32f3e" label="Logout" onClick={handleLogout} />
                 </div>
               )}
             </div>
@@ -262,9 +240,9 @@ export default function Dashboard() {
         maxWidth: 1080,
         margin: "28px auto 22px",
         display: "flex",
-        gap: 20,
+        gap: 18,
         overflowX: "auto",
-        padding: "0 12px"
+        padding: "0 15px"
       }}>
         <StatCard theme={theme} icon={<FaUser />} label="Username" value={user?.displayName || user?.email || "Guest"} />
         <StatCard theme={theme} icon={<FaWallet />} label="Balance" value={`₹${balance.toFixed(2)} INR`} />
@@ -272,41 +250,38 @@ export default function Dashboard() {
         <StatCard theme={theme} icon={<FaMoneyCheckAlt />} label="Spent Balance" value={`₹0.00`} />
       </section>
 
-      {/* Banner with professional text and subtle emojis */}
+      {/* Short, Emoji Rich Banner */}
       <section style={{
         maxWidth: 720,
-        margin: "0 auto 36px",
+        margin: "0 auto 32px",
         padding: "0 14px",
         textAlign: "center",
         fontWeight: 600,
-        fontSize: "1.16em",
-        lineHeight: 1.48,
-        color: theme === "dark" ? accentColor : primaryColor,
-        userSelect: "none"
+        fontSize: "1.09em",
+        color: secondaryColor
       }}>
-        🚀 <strong>LuciXFire Panel</strong> is your all-in-one Social Media Marketing platform — delivering secure payments, instant order processing, and comprehensive campaign management. Elevate your brand effortlessly with scalable services trusted by professionals worldwide. Support is just a message away to ensure your success.
+        🌟 LucixFire Panel: Manage all your SMM boosts in one place — fast, easy, trusted! 🚀✨
       </section>
 
       {/* Main Order Form */}
       <form
         onSubmit={submitOrder}
         style={{
-          maxWidth: 530,
-          margin: "0 auto 48px",
-          background: theme === "dark" ? secondaryColor : "#fdfefe",
-          borderRadius: 22,
-          padding: "28px 22px",
-          boxShadow: theme === "dark" ? "0 10px 32px rgba(32,48,85,0.55)" : "0 7px 28px rgba(39,71,114,0.12)",
-          color: theme === "dark" ? textLight : textDark,
+          maxWidth: 460,
+          margin: "0 auto 28px",
+          background: theme === "dark" ? "#183971" : "#f5f8fb",
+          borderRadius: 20,
+          padding: "25px 16px",
+          boxShadow: theme === "dark" ? "0 7px 24px #29499335" : "0 4px 18px #19417c13",
+          color: theme === "dark" ? "#e8f5ff" : primaryColor,
           userSelect: "none"
         }}
         noValidate
       >
-        <div style={{ display: "flex", gap: 14, marginBottom: 20 }}>
+        <div style={{ display: "flex", gap: 14, marginBottom: 15 }}>
           <button type="button" style={tabBtn(true, theme)}>🛒 New Order</button>
           <button type="button" style={tabBtn(false, theme)} onClick={() => setShowFunds(true)}>💵 Add Funds</button>
         </div>
-
         <input
           type="search"
           placeholder="Search Services..."
@@ -314,26 +289,20 @@ export default function Dashboard() {
           onChange={e => setSearch(e.target.value)}
           style={searchInput(theme)}
           autoComplete="off"
-          spellCheck={false}
-          aria-label="Search services"
         />
-
         <label style={smallLbl}>Category</label>
         <select
-          aria-label="Category"
           value={cat}
           onChange={e => { setCat(e.target.value); setSvc(null); setQty(""); setLink(""); }}
           style={selectBox(theme)}
         >
           {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
         </select>
-
         <label style={smallLbl}>Services</label>
         <select
-          aria-label="Services"
           value={svc?.id || ""}
           onChange={e => {
-            const found = (services[cat] || []).find(s => s.id === e.target.value);
+            const found = (services[cat] || []).find(x => x.id === e.target.value);
             setSvc(found || null);
             setCharge("0.00");
             setQty("");
@@ -344,43 +313,34 @@ export default function Dashboard() {
           <option value="">Select Service</option>
           {filteredServices.map(s => (
             <option key={s.id} value={s.id}>
-              {s.badge ? `[${s.badge}] ` : ""}
-              {s.title}
+              {s.badge ? `[${s.badge}] ` : ""}{s.title}
             </option>
           ))}
         </select>
-
         {svc && (
           <>
             <div style={descCard(theme)}>
-              <strong style={{ color: accentColor, fontSize: "1em" }}>
-                {svc.badge && (
-                  <span style={{
-                    background: svc.badgeColor,
-                    borderRadius: 8,
-                    color: "#fff",
-                    padding: "5px 12px",
-                    marginRight: 10,
-                    fontWeight: 700,
-                    fontSize: ".9em",
-                    userSelect: "none"
-                  }}>
-                    {svc.badge}
-                  </span>
-                )}
+              <b style={{ color: accentColor, fontSize: ".98em" }}>
+                {svc.badge && (<span style={{
+                  background: svc.badgeColor,
+                  borderRadius: 7,
+                  color: "#fff",
+                  padding: "2px 9px",
+                  marginRight: 8,
+                  fontWeight: 700
+                }}>{svc.badge}</span>)}
                 {svc.title}
-              </strong>
-              <pre style={{ marginTop: 8, whiteSpace: "pre-wrap", color: "#94c0ed", fontSize: "0.95em" }}>{svc.desc}</pre>
+              </b>
+              <pre style={{ marginTop: 7, color: "#7abef5", fontSize: ".95em", whiteSpace: "pre-wrap"}}>{svc.desc}</pre>
             </div>
             <div style={descCard(theme)}>
               <b>Average Time</b><br />{svc.avgtime}
             </div>
-            <div style={{ marginBottom: 10, fontWeight: 700, fontSize: ".95em", color: "#9bbfff" }}>
+            <div style={{ marginBottom: 7, fontWeight: 700, fontSize: ".97em", color: "#6e9ba5" }}>
               Min: {svc.min} - Max: {svc.max}
             </div>
           </>
         )}
-
         <label style={smallLbl}>Link</label>
         <input
           type="url"
@@ -389,91 +349,71 @@ export default function Dashboard() {
           onChange={e => setLink(e.target.value)}
           style={inputBox(theme)}
           disabled={!svc}
-          autoComplete="off"
-          spellCheck={false}
           required={!!svc}
-          aria-describedby="link-desc"
         />
-        <small id="link-desc" style={{ color: accentColor, marginBottom: 6, display: "block", fontSize: "0.82em", userSelect: "none" }}>
-          Please paste the correct post/profile link for accurate service delivery.
-        </small>
-
         <label style={smallLbl}>Quantity</label>
         <input
           type="number"
-          placeholder="Quantity"
-          min={svc?.min || 1}
-          max={svc?.max || 1000000}
+          min={svc?.min || ""}
+          max={svc?.max || ""}
           value={qty}
           onChange={e => setQty(e.target.value.replace(/^0+/, ""))}
           style={inputBox(theme)}
           disabled={!svc}
           required={!!svc}
-          autoComplete="off"
-          aria-label="Quantity"
         />
-
         <div style={descCard(theme)}>
           <b>Charge</b><br />₹{charge}
         </div>
-
         {orderMsg && (
           <div style={{
             fontWeight: 700,
             marginTop: 14,
             textAlign: "center",
-            color: orderMsg.startsWith("✅") ? "#4ed964" : "#ff6060",
-            userSelect: "none"
+            color: orderMsg.startsWith("✅") ? "#3ad97b" : "#f65d5d"
           }}>
             {orderMsg}
           </div>
         )}
-
         <button
           type="submit"
           disabled={!svc || !qty || !link || charge === "0.00"}
           style={{
-            marginTop: 18,
+            marginTop: 17,
             width: "100%",
             background: `linear-gradient(90deg, ${accentColor}, ${secondaryColor})`,
             color: "#fff",
             fontWeight: 900,
-            fontSize: "1.15em",
-            padding: "16px 0",
-            borderRadius: 16,
+            fontSize: "1.12em",
+            padding: "14px 0",
+            borderRadius: 15,
             border: "none",
-            cursor: (!svc || !qty || !link || charge === "0.00") ? "not-allowed" : "pointer",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 12,
-            userSelect: "none",
-            transition: "background-color 0.3s ease"
+            cursor: (!svc || !qty || !link || charge === "0.00") ? "not-allowed" : "pointer"
           }}
-          aria-disabled={!svc || !qty || !link || charge === "0.00"}
         >
-          <FaWhatsapp style={{ fontSize: "1.3em" }} /> Place Order
+          <FaWhatsapp style={{ fontSize: "1.21em" }} /> Place Order
         </button>
       </form>
 
-      {/* MODALS */}
+      {/* Modals */}
       {showFunds && <AddFundsModal user={user} theme={theme} onClose={() => setShowFunds(false)} loading={loadingFundsSubmit} onSubmit={handleAddFundsSubmit} />}
       {showProfile && <ProfileModal user={user} onClose={() => setShowProfile(false)} />}
       {showHistory && <HistoryModal orders={orders} onClose={() => setShowHistory(false)} />}
       {showSettings && <SettingsModal user={user} onSave={handleProfileSave} onClose={() => setShowSettings(false)} />}
 
-      {/* FOOTER */}
+      {/* Footer */}
       <footer style={{
         textAlign: "center",
-        padding: "18px 10px",
-        fontSize: "0.9em",
-        color: theme === "dark" ? "#87a6d9" : "#3a4a6f",
+        padding: "16px 0 6px",
+        fontSize: "0.98em",
+        color: "#7baad3",
         borderTop: `1px solid ${accentColor}`,
-        userSelect: "none",
-        position: "absolute",
+        background: "transparent",
+        position: "fixed",
+        left: 0,
         bottom: 0,
         width: "100%",
-        background: theme === "dark" ? primaryColor : "#fefefe"
+        zIndex: 80
       }}>
         © {new Date().getFullYear()} LucixFire Panel. All rights reserved.
       </footer>
@@ -481,7 +421,6 @@ export default function Dashboard() {
   );
 }
 
-// AddFundsModal restored with QR & steps, fixed submit button
 function AddFundsModal({ user, theme, onClose, loading, onSubmit }) {
   const [amount, setAmount] = useState("");
   const [msg, setMsg] = useState("");
@@ -501,86 +440,67 @@ function AddFundsModal({ user, theme, onClose, loading, onSubmit }) {
       <div style={{
         fontWeight: 700,
         color: "#18c332",
-        marginBottom: 10,
+        marginBottom: 8,
         textAlign: "center",
-        fontSize: "1.05em",
         backgroundColor: "#e8fff3",
-        padding: "10px 14px",
-        borderRadius: 9,
-        lineHeight: 1.3,
-        userSelect: "none"
+        borderRadius: 8,
+        padding: "9px"
       }}>
-        🎁 <span style={{ color: "#1981f7" }}>Limited Offer:</span> Deposit over <b>₹100</b> to receive an instant <b>10% bonus credit</b>! 🎉
+        🎁 Deposit above <b>₹100</b> gets you instant <b>10% bonus</b>!
       </div>
-
       <div style={{
         fontWeight: 600,
-        color: theme === "dark" ? "#40e19f" : "#222",
-        marginBottom: 12,
+        color: "#228edc",
         textAlign: "center",
-        fontSize: "0.95em",
-        userSelect: "none"
-      }}>
-        <b>UPI:</b> <span style={{ color: "#2884f6", fontWeight: "900" }}>boraxdealer@fam</span>
-      </div>
-
-      <img src="https://files.catbox.moe/xva1pb.jpg" alt="UPI QR Code" style={{ width: 150, borderRadius: 14, margin: "10px auto 18px", display: "block", background: "#fff" }} />
-
-      <ol style={{ color: "#577ea1", fontSize: "0.95em", margin: "0 0 14px 12px", userSelect: "none" }}>
-        <li>Pay via UPI using the ID above or scan the QR code.</li>
-        <li>Take a screenshot of your payment confirmation.</li>
-        <li>Submit the amount you've paid below (minimum ₹30).</li>
-        <li>Admin will verify and approve your deposit shortly.</li>
+        marginBottom: 8
+      }}>UPI: <span style={{ color: "#2884f6", fontWeight: 900 }}>boraxdealer@fam</span></div>
+      <img src="https://files.catbox.moe/xva1pb.jpg" alt="UPI QR" style={{ width: 140, borderRadius: 13, display: "block", margin: "12px auto 14px", background: "#fff" }} />
+      <ol style={{ color: "#5993b2", marginBottom: 10, paddingLeft: 17, fontSize: "0.91em" }}>
+        <li>Pay with above UPI or QR code.</li>
+        <li>Submit the paid amount (min ₹30).</li>
+        <li>Admin accepts or rejects your request soon.</li>
       </ol>
-
-      <form onSubmit={handleSubmit} noValidate>
+      <form onSubmit={handleSubmit}>
         <input
           type="number"
           min={30}
           placeholder="Enter Amount (₹30+)"
           style={{
             width: "100%",
+            padding: "13px 10px",
+            marginBottom: 11,
             borderRadius: 8,
-            padding: "14px 12px",
-            border: "1.7px solid #b1d7f9",
-            fontWeight: 700,
-            fontSize: "1em",
-            marginBottom: 18,
-            color: "#222"
+            border: "1.3px solid #c2eafc",
+            fontWeight: 700
           }}
           value={amount}
           onChange={e => setAmount(e.target.value.replace(/^0+/, ""))}
           disabled={loading}
-          required
-          autoComplete="off"
         />
-
         <button
           type="submit"
           disabled={loading}
           style={{
             width: "100%",
-            padding: "16px 0",
+            padding: "13px 0",
+            margin: "6px 0 2px",
+            borderRadius: 8,
             fontWeight: 900,
-            borderRadius: 10,
             border: "none",
-            userSelect: "none",
-            cursor: loading ? "wait" : "pointer",
-            background: loading ? "#90caf9" : "linear-gradient(90deg, #42a5f5, #1e88e5)",
+            background: loading ? "#badfff" : "linear-gradient(90deg,#34b992,#1e78e8)",
             color: "#fff",
-            fontSize: "1.12em",
-            transition: "background-color 0.3s ease"
+            fontSize: "1.09em",
+            cursor: loading ? "progress" : "pointer"
           }}
         >
           {loading ? "Submitting..." : "Submit"}
         </button>
-
         {msg && (
           <div style={{
-            marginTop: 14,
+            marginTop: 10,
             fontWeight: 700,
             textAlign: "center",
-            color: msg.startsWith("✅") ? "#43a047" : "#d32f2f"
+            color: msg.startsWith("✅") ? "#1fb963" : "#e75d74"
           }}>
             {msg}
           </div>
@@ -590,47 +510,43 @@ function AddFundsModal({ user, theme, onClose, loading, onSubmit }) {
   );
 }
 
-// Other modals...
-
 function ProfileModal({ user, onClose }) {
   return (
     <Modal title="Profile" onClose={onClose}>
-      <div style={{ textAlign: "center", padding: 20, userSelect: "none" }}>
-        <img src="/logo.png" alt="User avatar" style={{ height: 68, width: 68, borderRadius: 20, background: "transparent", marginBottom: 14 }} />
-        <div style={{ fontWeight: 700, fontSize: "1.24em", marginBottom: 8, color: primaryColor }}>
+      <div style={{ textAlign: "center", padding: 14 }}>
+        <img src="/logo.png" alt="User Avatar" style={{ height: 62, width: 62, borderRadius: 19, background: "transparent", marginBottom: 10 }} />
+        <div style={{ fontWeight: 800, fontSize: "1.1em", marginBottom: 2, color: secondaryColor }}>
           {user?.displayName || user?.email || "Guest"}
         </div>
-        <div style={{ color: secondaryColor, fontWeight: 600 }}>LuciXFire User</div>
+        <div style={{ color: accentColor, fontWeight: 600 }}>LuciXFire User</div>
       </div>
     </Modal>
   );
 }
-
 function HistoryModal({ orders, onClose }) {
   return (
     <Modal title="My Orders" onClose={onClose}>
       {orders.length === 0 ? (
-        <p style={{ color: "#999", fontStyle: "italic", textAlign: "center", marginTop: 28 }}>
-          You have not placed any orders yet.
+        <p style={{ color: "#919ab2", fontStyle: "italic", textAlign: "center", margin: 24 }}>
+          No orders placed yet.
         </p>
       ) : (
         <div style={{ maxHeight: "60vh", overflowY: "auto", paddingRight: 6 }}>
           {orders.map(o => (
             <div key={o.id} style={{
               border: `2px solid ${accentColor}`,
-              borderRadius: 16,
-              padding: 18,
-              marginBottom: 16,
-              backgroundColor: "#e9f5fb",
-              color: primaryColor,
-              fontSize: "0.95em",
-              boxShadow: "0 6px 18px rgba(26, 91, 132, 0.1)",
-              userSelect: "text"
+              borderRadius: 14,
+              padding: 13,
+              marginBottom: 14,
+              fontSize: "0.98em",
+              background: "#f1fdff",
+              color: secondaryColor,
+              boxShadow: "0 2px 15px #36c2ff16"
             }}>
               <div><b>Order ID:</b> {o.id}</div>
               <div><b>Service:</b> {o.serviceTitle || o.service_id}</div>
-              <div><b>Quantity:</b> {o.qty}</div>
-              <div><b>Link:</b> <a href={o.link} target="_blank" rel="noreferrer" style={{ color: accentColor, wordBreak: "break-word" }}>{o.link}</a></div>
+              <div><b>Qty:</b> {o.qty}</div>
+              <div><b>Link:</b> <a href={o.link} style={{ color: accentColor }} target="_blank" rel="noreferrer">{o.link}</a></div>
               <div><b>Price:</b> ₹{o.charge.toFixed(2)}</div>
               <div><b>Status:</b> <span style={{ color: o.status === "pending" ? "#f0ad4e" : o.status === "completed" ? "#43a047" : "#d32f2f", fontWeight: 700 }}>{o.status}</span></div>
             </div>
@@ -640,47 +556,38 @@ function HistoryModal({ orders, onClose }) {
     </Modal>
   );
 }
-
 function SettingsModal({ user, onSave, onClose }) {
   const [name, setName] = useState(user?.displayName || "");
   const [mail, setMail] = useState(user?.email || "");
   const [pass, setPass] = useState("");
   const [info, setInfo] = useState("");
-
   return (
     <Modal title="Settings" onClose={onClose}>
-      <form onSubmit={e => { e.preventDefault(); onSave(name, mail, pass, setInfo); }} noValidate style={{ userSelect: "none" }}>
-        <div style={{ marginBottom: 14 }}>
+      <form onSubmit={e => { e.preventDefault(); onSave(name, mail, pass, setInfo); }}>
+        <div style={{ marginBottom: 13 }}>
           <label style={{ fontWeight: 700 }}>Username</label>
-          <input style={inputBox("light")} value={name} onChange={e => setName(e.target.value)} autoComplete="username" />
+          <input style={inputBox("light")} value={name} onChange={e => setName(e.target.value)} />
         </div>
-        <div style={{ marginBottom: 14 }}>
+        <div style={{ marginBottom: 13 }}>
           <label style={{ fontWeight: 700 }}>Email</label>
-          <input style={inputBox("light")} value={mail} onChange={e => setMail(e.target.value)} autoComplete="email" />
+          <input style={inputBox("light")} value={mail} onChange={e => setMail(e.target.value)} />
         </div>
-        <div style={{ marginBottom: 22 }}>
+        <div style={{ marginBottom: 20 }}>
           <label style={{ fontWeight: 700 }}>Password</label>
-          <input style={inputBox("light")} type="password" value={pass} onChange={e => setPass(e.target.value)} autoComplete="new-password" />
+          <input style={inputBox("light")} type="password" value={pass} onChange={e => setPass(e.target.value)} />
         </div>
-        <button
-          type="submit"
-          style={{
-            width: "100%",
-            padding: "14px 0",
-            fontWeight: 900,
-            borderRadius: 14,
-            border: "none",
-            background: `linear-gradient(90deg, ${accentColor}, ${secondaryColor})`,
-            color: "#fff",
-            fontSize: "1.14em",
-            cursor: "pointer",
-            userSelect: "none"
-          }}
-        >
-          Change Info
-        </button>
+        <button style={{
+          width: "100%",
+          padding: "14px 0",
+          fontWeight: 900,
+          borderRadius: 14,
+          border: "none",
+          background: `linear-gradient(90deg, ${accentColor}, ${secondaryColor})`,
+          color: "#fff",
+          fontSize: "1.13em"
+        }}>Change Info</button>
         {info && (
-          <div style={{ marginTop: 14, fontWeight: 700, color: info.startsWith("✅") ? "#2e7d32" : "#d32f2f" }}>
+          <div style={{ marginTop: 12, fontWeight: 700, color: info.startsWith("✅") ? "#2e7d32" : "#d32f2f" }}>
             {info}
           </div>
         )}
@@ -688,105 +595,69 @@ function SettingsModal({ user, onSave, onClose }) {
     </Modal>
   );
 }
-
 function Modal({ title, children, onClose }) {
   return (
     <div style={{
-      position: "fixed",
-      top: 0, left: 0,
-      width: "100vw",
-      height: "100vh",
-      background: "rgba(27, 54, 93, 0.2)",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      zIndex: 160,
+      position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", zIndex: 160, background: "rgba(32,50,74,0.18)", display: "flex", alignItems: "center", justifyContent: "center"
     }}>
       <div style={{
-        background: "#fff",
-        borderRadius: 22,
-        maxWidth: "95vw",
-        width: 380,
-        maxHeight: "85vh",
-        overflowY: "auto",
-        padding: 28,
-        boxShadow: "0 14px 38px rgba(27, 54, 93, 0.3)",
-        position: "relative"
+        background: "#fff", borderRadius: 18, width: 370, maxWidth: "97vw", maxHeight: "88vh", overflowY: "auto",
+        boxShadow: "0 10px 36px #24deff45", padding: "29px 16px 17px", position: "relative"
       }}>
-        <button
-          onClick={onClose}
-          aria-label="Close modal"
-          style={{
-            position: "absolute",
-            top: 12,
-            right: 14,
-            border: "none",
-            background: "none",
-            fontSize: 28,
-            color: primaryColor,
-            cursor: "pointer",
-            userSelect: "none",
-            lineHeight: 1
-          }}
-        >
-          &times;
-        </button>
-        <h3 style={{ color: primaryColor, fontWeight: 900, marginBottom: 20 }}>{title}</h3>
+        <button type="button" onClick={onClose} style={{
+          position: "absolute", right: 17, top: 9, border: "none", fontSize: "2em", background: "none", color: "#217dbb", cursor: "pointer"
+        }}>&times;</button>
+        <div style={{ fontWeight: 900, fontSize: "1.12em", marginBottom: 13, color: "#237ecb" }}>{title}</div>
         {children}
       </div>
     </div>
   );
 }
-
 function StatCard({ icon, label, value, theme }) {
   return (
     <div style={{
       flex: "0 0 170px",
-      background: theme === "dark" ? "#294a81" : "#e9f1fc",
-      borderRadius: 18,
-      minWidth: 160,
-      boxShadow: "0 6px 18px rgba(15, 75, 130, 0.1)",
-      padding: "24px 18px",
-      userSelect: "none",
-      color: theme === "dark" ? textLight : textDark,
-      transition: "background-color 0.25s ease, color 0.25s ease"
+      background: theme === "dark" ? "#21406c" : "#e8f3fa",
+      borderRadius: 13,
+      minWidth: 150,
+      boxShadow: "0 2px 8px #1786ed13",
+      padding: "18px 13px",
+      color: theme === "dark" ? "#e9faff" : secondaryColor
     }}>
       <span style={{
-        background: theme === "dark" ? "#1e3562" : "#d6e7fc",
-        borderRadius: 10,
-        padding: "10px 14px",
-        fontSize: "1.35em",
-        marginBottom: 10,
+        background: theme === "dark" ? "#24436c" : "#d7f1ff",
+        borderRadius: 7,
+        padding: "7px 10px",
+        fontSize: "1.2em",
+        marginBottom: 7,
         display: "inline-block",
         color: accentColor
       }}>{icon}</span>
-      <div style={{ fontWeight: 700, fontSize: "1.05em", marginBottom: 8 }}>{label}</div>
-      <div style={{ fontWeight: 900, fontSize: "1.3em" }}>{value}</div>
+      <span style={{ fontWeight: 700, fontSize: ".99em", display: "block" }}>{label}</span>
+      <span style={{ fontWeight: 800, fontSize: "1.13em", marginTop: 4, display: "block" }}>{value}</span>
     </div>
   );
 }
-
-function DropdownItem({ icon, label, onClick, color }) {
+function DropdownItem({ theme, icon, label, onClick, color }) {
   return (
     <div
-      role="menuitem"
       tabIndex={0}
       onClick={onClick}
       onKeyDown={e => { if (e.key === "Enter") onClick(); }}
       style={{
-        padding: "14px 22px",
+        padding: "13px 21px",
         display: "flex",
         alignItems: "center",
-        gap: 12,
+        gap: 11,
         cursor: "pointer",
-        color: color || primaryColor,
+        color: color || (theme === "dark" ? "#fff" : secondaryColor),
         fontWeight: 700,
-        fontSize: "1em",
+        fontSize: "1.04em",
         userSelect: "none",
-        transition: "background-color 0.2s ease",
+        transition: "background 0.19s, color 0.19s",
         outline: "none"
       }}
-      onMouseOver={e => e.currentTarget.style.backgroundColor = "#d6e8ff"}
+      onMouseOver={e => e.currentTarget.style.backgroundColor = theme === "dark" ? "#183671" : "#e5f6fe"}
       onMouseOut={e => e.currentTarget.style.backgroundColor = "transparent"}
     >
       {icon} {label}
@@ -794,82 +665,55 @@ function DropdownItem({ icon, label, onClick, color }) {
   );
 }
 
+// shared styles
 const tabBtn = (active, theme) => ({
   flex: 1,
   background: active ? accentColor : "transparent",
   color: active ? primaryColor : accentColor,
   border: active ? "none" : `2px solid ${accentColor}`,
-  padding: "14px 0",
-  borderRadius: 14,
+  padding: "13px 0",
+  borderRadius: 12,
   fontWeight: 900,
-  fontSize: "1.18em",
+  fontSize: "1.13em",
   cursor: "default",
-  userSelect: "none",
-  boxShadow: active ? `0 2px 12px ${accentColor}` : "none",
-  transition: "background-color 0.3s, color 0.3s"
+  boxShadow: active ? `0 2px 10px #36e4fd85` : "none"
 });
-
 const selectBox = theme => ({
   width: "100%",
-  borderRadius: 14,
-  padding: "14px 14px",
+  borderRadius: 10,
+  padding: "12px 11px",
   fontWeight: 700,
-  background: theme === "dark" ? secondaryColor : "#fcfeff",
-  fontSize: "1.02em",
-  color: theme === "dark" ? textLight : primaryColor,
-  border: `1.6px solid ${accentColor}`,
-  marginBottom: 14,
-  userSelect: "none",
-  outline: "none",
-  transition: "border-color 0.3s"
+  background: theme === "dark" ? "#21345f" : "#f9fcfe",
+  fontSize: "1.01em",
+  color: theme === "dark" ? "#f2ffff" : secondaryColor,
+  border: `1.5px solid ${accentColor}`,
+  marginBottom: 9
 });
-
 const inputBox = theme => ({
   width: "100%",
-  borderRadius: 14,
-  padding: "14px 14px",
+  borderRadius: 9,
+  padding: "13px 10px",
   fontWeight: 700,
-  fontSize: "1.02em",
-  background: theme === "dark" ? "#284781" : "#fcfcfc",
-  color: theme === "dark" ? textLight : primaryColor,
-  border: `1.6px solid ${accentColor}`,
-  marginBottom: 14,
-  userSelect: "text",
-  outline: "none",
-  transition: "border-color 0.3s"
+  fontSize: "1.01em",
+  background: theme === "dark" ? "#254676" : "#f8fafb",
+  color: theme === "dark" ? "#f7fff7" : "#222",
+  border: "1.5px solid #b5ebfa",
+  marginBottom: 9
 });
-
-const smallLbl = {
-  fontWeight: 700,
-  color: accentColor,
-  marginBottom: 8,
-  display: "block",
-  fontSize: "1.02em",
-  userSelect: "none"
-};
-
+const smallLbl = { fontWeight: 700, color: accentColor, marginBottom: 6, display: "block", fontSize: "1em" };
 const descCard = theme => ({
-  background: theme === "dark" ? "#2d4e8a" : "#e7f2fc",
-  color: theme === "dark" ? accentColor : primaryColor,
-  borderRadius: 18,
-  padding: "18px 16px",
-  fontWeight: 600,
-  fontSize: "0.98em",
-  marginBottom: 14,
-  userSelect: "text",
-  whiteSpace: "pre-wrap"
+  background: theme === "dark" ? "#285090" : "#e6f5fd",
+  color: theme === "dark" ? "#d5f0ff" : secondaryColor,
+  borderRadius: 11, padding: "10px 10px", fontWeight: 600, fontSize: ".98em", marginBottom: 7
 });
-
 const searchInput = theme => ({
   width: "100%",
-  borderRadius: 14,
-  padding: "14px 14px",
+  borderRadius: 10,
+  padding: "13px 11px",
   fontWeight: 700,
-  fontSize: "1.08em",
+  fontSize: "1.03em",
   color: accentColor,
-  background: theme === "dark" ? secondaryColor : "#e9f0fa",
-  border: `1.6px solid ${accentColor}`,
-  marginBottom: 18,
-  outline: "none",
-  userSelect: "text"
+  background: theme === "dark" ? "#232e4b" : "#e3f1fa",
+  border: `1.5px solid ${accentColor}`,
+  marginBottom: 13
 });
