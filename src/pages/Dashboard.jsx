@@ -14,6 +14,7 @@ const categories = [
   { value: "ig-followers-new", label: "IG Followers New" },
   { value: "telegram", label: "Telegram" }
 ];
+
 const services = {
   "new-ig": [
     { id: "1572", title: "Instagram Reels Views [NoN~Drop | 10M/Day]", badge: "1572", badgeColor: "#0cb2ed", desc: "Start: Instant\nSpeed: 10M/Day", avgtime: "3 hours", min: 100, max: 1000000, price: 0.13 }
@@ -205,7 +206,7 @@ export default function Dashboard() {
             alignItems: "center",
             gap: 14
           }}>
-            <img src="/logo.png" alt="Logo" style={{ height: 38, borderRadius: 22 }} />
+            <img src="/logo.png" alt="Logo" style={{ height: 38, borderRadius: 22, background: "transparent" }} />
             LucixFire Panel
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -432,33 +433,9 @@ export default function Dashboard() {
           <FaWhatsapp style={{ fontSize: "1.21em" }} /> Place Order
         </button>
       </form>
-
-      {showFunds && <AddFundsModal user={user} theme={theme} onClose={() => setShowFunds(false)} loading={loadingFundsSubmit} onSubmit={handleAddFundsSubmit} />}
-      {showProfile && <ProfileModal user={user} onClose={() => setShowProfile(false)} />}
-      {showHistory && <HistoryModal orders={orders} payments={payments} history={history} onClose={() => setShowHistory(false)} />}
-      {showSettings && <SettingsModal user={user} onSave={handleProfileSave} onClose={() => setShowSettings(false)} />}
-
-      <footer style={{
-        textAlign: "center",
-        padding: "16px 0 6px",
-        fontSize: "0.98em",
-        color: "#7baad3",
-        borderTop: `1px solid ${accentColor}`,
-        background: "transparent",
-        position: "fixed",
-        left: 0,
-        bottom: 0,
-        width: "100%",
-        zIndex: 80,
-        userSelect: "none"
-      }}>
-        © {new Date().getFullYear()} LucixFire Panel. All rights reserved.
-      </footer>
     </div>
   );
 }
-
-// Modals & components below
 
 function AddFundsModal({ user, theme, onClose, loading, onSubmit }) {
   const [amount, setAmount] = useState("");
@@ -499,7 +476,7 @@ function AddFundsModal({ user, theme, onClose, loading, onSubmit }) {
       <ol style={{ color: "#5993b2", marginBottom: 10, paddingLeft: 17, fontSize: "0.91em", userSelect: "none" }}>
         <li>Pay with above UPI or QR code.</li>
         <li>Submit the paid amount (min ₹30).</li>
-        <li>Admin accepts or rejects your request soon.</li>
+        <li>Admin will accept your request soon.</li>
       </ol>
       <form onSubmit={handleSubmit}>
         <input
@@ -573,7 +550,7 @@ function HistoryModal({ orders, payments, history, onClose }) {
         {payments.length === 0 ? <p style={{ color: "#999", fontStyle: "italic" }}>No fund requests.</p> :
           payments.map(p => (
             <div key={p.id} style={historyItemStyle}>
-              Requested: ₹{p.amount.toFixed(2)} - Status: <span style={{ fontWeight: "bold", color: statusColor(p.status) }}>{p.status}</span>
+              Requested: ₹{p.amount.toFixed(2)} - Status: <span style={{ fontWeight: "bold", color: statusColor(p.status) }}>{p.status || 'pending'}</span>
             </div>
           ))
         }
@@ -615,22 +592,22 @@ function SettingsModal({ user, onSave, onClose }) {
   const [pass, setPass] = useState("");
   const [info, setInfo] = useState("");
 
-  const textColor = "#2360af"; // brighter in soft blue theme
+  const textColor = "#2360af";
 
   return (
     <Modal title="Settings" onClose={onClose}>
       <form onSubmit={e => { e.preventDefault(); onSave(name, mail, pass, setInfo); }}>
         <div style={{ marginBottom: 13 }}>
           <label style={{ fontWeight: 700, color: textColor }}>Username</label>
-          <input style={{ ...inputBox("light"), color: textColor, fontWeight: 700 }} value={name} onChange={e => setName(e.target.value)} />
+          <input style={{ ...inputBox("light"), color: textColor, fontWeight: 700 }} value={name} onChange={e => setName(e.target.value)} autoComplete="username" />
         </div>
         <div style={{ marginBottom: 13 }}>
           <label style={{ fontWeight: 700, color: textColor }}>Email</label>
-          <input style={{ ...inputBox("light"), color: textColor, fontWeight: 700 }} value={mail} onChange={e => setMail(e.target.value)} />
+          <input style={{ ...inputBox("light"), color: textColor, fontWeight: 700 }} value={mail} onChange={e => setMail(e.target.value)} autoComplete="email" />
         </div>
         <div style={{ marginBottom: 20 }}>
           <label style={{ fontWeight: 700, color: textColor }}>Password</label>
-          <input style={{ ...inputBox("light"), color: textColor, fontWeight: 700 }} type="password" value={pass} onChange={e => setPass(e.target.value)} />
+          <input style={{ ...inputBox("light"), color: textColor, fontWeight: 700 }} type="password" value={pass} onChange={e => setPass(e.target.value)} autoComplete="new-password" />
         </div>
         <button style={{
           width: "100%",
@@ -776,3 +753,11 @@ const searchInput = theme => ({
   border: `1.5px solid ${accentColor}`,
   marginBottom: 13
 });
+
+function statusColor(status) {
+  if (!status) return "#666";
+  if (status === "pending") return "#f0ad4e";
+  if (status === "completed" || status === "accepted") return "#43a047";
+  if (status === "rejected") return "#d32f2f";
+  return "#333";
+}
