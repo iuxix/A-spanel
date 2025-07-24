@@ -161,7 +161,9 @@ export default function Dashboard() {
       background: theme === "dark" ? primaryColor : "#fefefe",
       color: theme === "dark" ? textLight : textDark,
       fontFamily: "'Poppins', sans-serif",
-      transition: "background-color 0.3s ease, color 0.3s ease"
+      transition: "background-color 0.3s ease, color 0.3s ease",
+      position: "relative",
+      paddingBottom: 60
     }}>
       {/* NAVBAR */}
       <nav style={{
@@ -218,13 +220,14 @@ export default function Dashboard() {
                 style={{
                   background: "none",
                   border: "none",
-                  color: theme === "dark" ? "#80dfff" : "#0b3c7f",
-                  fontSize: "1.35em",
+                  color: theme === "dark" ? "#a9dfff" : "#064f91",
+                  fontSize: "1.6em",
                   padding: "6px 14px",
                   borderRadius: 18,
                   cursor: "pointer",
                   outline: showMenu ? `2px solid ${accentColor}` : "none",
-                  userSelect: "none"
+                  userSelect: "none",
+                  transition: "color 0.3s"
                 }}
               ><FaEllipsisV /></button>
 
@@ -238,7 +241,7 @@ export default function Dashboard() {
                     top: 40,
                     right: 0,
                     boxShadow: "0 8px 23px rgba(34,97,151,0.25)",
-                    minWidth: 172,
+                    minWidth: 180,
                     zIndex: 30
                   }}
                 >
@@ -269,7 +272,7 @@ export default function Dashboard() {
         <StatCard theme={theme} icon={<FaMoneyCheckAlt />} label="Spent Balance" value={`₹0.00`} />
       </section>
 
-      {/* Banner with emoji rich & professional text */}
+      {/* Banner with professional text and subtle emojis */}
       <section style={{
         maxWidth: 720,
         margin: "0 auto 36px",
@@ -281,7 +284,7 @@ export default function Dashboard() {
         color: theme === "dark" ? accentColor : primaryColor,
         userSelect: "none"
       }}>
-        🚀 <strong>LuciXFire Panel</strong> is your all-in-one 🌐 Social Media Marketing platform — delivering 🔒 secure payments, 💨 instant order processing, and 🛠️ comprehensive campaign management. Elevate your brand effortlessly with scalable services trusted by thousands every day. ☎️ Support is just a message away, ensuring your success! Let’s grow together! 📈✨
+        🚀 <strong>LuciXFire Panel</strong> is your all-in-one Social Media Marketing platform — delivering secure payments, instant order processing, and comprehensive campaign management. Elevate your brand effortlessly with scalable services trusted by professionals worldwide. Support is just a message away to ensure your success.
       </section>
 
       {/* Main Order Form */}
@@ -392,7 +395,7 @@ export default function Dashboard() {
           aria-describedby="link-desc"
         />
         <small id="link-desc" style={{ color: accentColor, marginBottom: 6, display: "block", fontSize: "0.82em", userSelect: "none" }}>
-          Please paste the correct post/profile link to deliver services accurately.
+          Please paste the correct post/profile link for accurate service delivery.
         </small>
 
         <label style={smallLbl}>Quantity</label>
@@ -458,6 +461,22 @@ export default function Dashboard() {
       {showProfile && <ProfileModal user={user} onClose={() => setShowProfile(false)} />}
       {showHistory && <HistoryModal orders={orders} onClose={() => setShowHistory(false)} />}
       {showSettings && <SettingsModal user={user} onSave={handleProfileSave} onClose={() => setShowSettings(false)} />}
+
+      {/* FOOTER */}
+      <footer style={{
+        textAlign: "center",
+        padding: "18px 10px",
+        fontSize: "0.9em",
+        color: theme === "dark" ? "#87a6d9" : "#3a4a6f",
+        borderTop: `1px solid ${accentColor}`,
+        userSelect: "none",
+        position: "absolute",
+        bottom: 0,
+        width: "100%",
+        background: theme === "dark" ? primaryColor : "#fefefe"
+      }}>
+        © {new Date().getFullYear()} LucixFire Panel. All rights reserved.
+      </footer>
     </div>
   );
 }
@@ -571,7 +590,7 @@ function AddFundsModal({ user, theme, onClose, loading, onSubmit }) {
   );
 }
 
-// Other modals (Profile, History, Settings, and reusable components)...
+// Other modals...
 
 function ProfileModal({ user, onClose }) {
   return (
