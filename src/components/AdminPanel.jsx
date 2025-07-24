@@ -10,7 +10,7 @@ const accentColor = "#36c2ff";
 
 export default function AdminPanel() {
   const [payments, setPayments] = useState([]);
-  const [userHistory, setUserHistory] = useState([]);
+  const [adminHistory, setAdminHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [actionMsg, setActionMsg] = useState("");
 
@@ -25,7 +25,7 @@ export default function AdminPanel() {
   useEffect(() => {
     const q = query(collection(db, "history"));
     const unsub = onSnapshot(q, snap => {
-      setUserHistory(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.timestamp - a.timestamp));
+      setAdminHistory(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.timestamp - a.timestamp));
     });
     return () => unsub();
   }, []);
@@ -53,10 +53,7 @@ export default function AdminPanel() {
     setLoading(false);
   }
 
-  async function rejectPayment(payment) {
-    // Rejection is not shown to user per your instruction,
-    // but admin can delete requests which are not accepted
-
+  async function deletePayment(payment) {
     setActionMsg(""); setLoading(true);
     try {
       await deleteDoc(doc(db, "payments", payment.id));
@@ -119,12 +116,8 @@ export default function AdminPanel() {
                   <td style={tdStyle}>{p.amount.toFixed(2)}</td>
                   <td style={tdStyle}>{p.created?.toDate ? p.created.toDate().toLocaleString() : new Date(p.created).toLocaleString()}</td>
                   <td style={tdStyle}>
-                    <button onClick={() => acceptPayment(p)} disabled={loading} style={btnAccept}>
-                      Accept
-                    </button>
-                    <button onClick={() => rejectPayment(p)} disabled={loading} style={btnReject}>
-                      Delete
-                    </button>
+                    <button onClick={() => acceptPayment(p)} disabled={loading} style={btnAccept}>Accept</button>
+                    <button onClick={() => deletePayment(p)} disabled={loading} style={btnReject}>Delete</button>
                   </td>
                 </tr>
               ))}
@@ -140,11 +133,11 @@ export default function AdminPanel() {
         }}>
           Action History (Auto-cleared after 24 hours)
         </h2>
-        {userHistory.length === 0 ? (
+        {adminHistory.length === 0 ? (
           <p style={{ color: "#666", fontStyle: "italic" }}>No action history available.</p>
         ) : (
           <div style={{ maxHeight: "55vh", overflowY: "auto" }}>
-            {userHistory.map(h => (
+            {adminHistory.map(h => (
               <div key={h.id} style={historyItemStyle}>
                 <div><b>{h.type.replace(/_/g, " ").toUpperCase()}</b> — {h.description}</div>
                 <div style={{ fontSize: "0.83em", color: "#555" }}>{new Date(h.timestamp).toLocaleString()}</div>
@@ -172,7 +165,6 @@ const tdStyle = {
   fontSize: "0.95em",
   verticalAlign: "middle"
 };
-
 const btnAccept = {
   background: "#36c239",
   border: "none",
@@ -184,7 +176,6 @@ const btnAccept = {
   cursor: "pointer",
   userSelect: "none"
 };
-
 const btnReject = {
   background: "#e53d4f",
   border: "none",
@@ -195,7 +186,6 @@ const btnReject = {
   cursor: "pointer",
   userSelect: "none"
 };
-
 const historyItemStyle = {
   backgroundColor: "#f4f7fe",
   borderRadius: 10,
