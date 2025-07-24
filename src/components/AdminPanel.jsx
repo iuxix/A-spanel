@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import {
-  collection, query, where, onSnapshot, doc, updateDoc, getDoc, deleteDoc
+  collection, query, where, onSnapshot, doc, updateDoc, getDoc, deleteDoc, addDoc
 } from "firebase/firestore";
 
 const primaryColor = "#1b365d";
@@ -14,7 +14,6 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(false);
   const [actionMsg, setActionMsg] = useState("");
 
-  // Listen payments requests (fund adds)
   useEffect(() => {
     const q = query(collection(db, "payments"), where("status", "==", "pending"));
     const unsub = onSnapshot(q, snap => {
@@ -23,21 +22,16 @@ export default function AdminPanel() {
     return () => unsub();
   }, []);
 
-  // Listen admin/user history (all actions)
   useEffect(() => {
-    const q = query(collection(db, "history"), 
-      // Optionally, order desc or filter; here fetch all for admin
-    );
+    const q = query(collection(db, "history"));
     const unsub = onSnapshot(q, snap => {
       setUserHistory(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.timestamp - a.timestamp));
     });
     return () => unsub();
   }, []);
 
-  // Accept payment: update user balance, delete payment doc, log action to history
   async function acceptPayment(payment) {
-    setActionMsg("");
-    setLoading(true);
+    setActionMsg(""); setLoading(true);
     try {
       const userRef = doc(db, "users", payment.user);
       const userSnap = await getDoc(userRef);
@@ -59,10 +53,8 @@ export default function AdminPanel() {
     setLoading(false);
   }
 
-  // Reject payment: delete payment doc, log action
   async function rejectPayment(payment) {
-    setActionMsg("");
-    setLoading(true);
+    setActionMsg(""); setLoading(true);
     try {
       await deleteDoc(doc(db, "payments", payment.id));
       await addDoc(collection(db, "history"), {
@@ -80,16 +72,16 @@ export default function AdminPanel() {
 
   return (
     <div style={{ maxWidth: 800, margin: "auto", padding: 30, fontFamily: "Poppins, sans-serif", color: primaryColor }}>
-      <h1 style={{ fontWeight: 900, fontSize: "1.8em", marginBottom: 24, borderBottom: `3px solid ${primaryColor}`, paddingBottom: 6 }}>
+      <h1 style={{
+        fontWeight: 900, fontSize: "1.8em", marginBottom: 24,
+        borderBottom: `3px solid ${primaryColor}`, paddingBottom: 6
+      }}>
         Admin Panel — Fund Requests & History
       </h1>
 
       {actionMsg && (
         <div style={{
-          padding: 14,
-          marginBottom: 20,
-          borderRadius: 9,
-          fontWeight: 700,
+          padding: 14, marginBottom: 20, borderRadius: 9, fontWeight: 700,
           color: actionMsg.startsWith("✅") ? "#2e7d32" : "#d32f2f",
           backgroundColor: actionMsg.startsWith("✅") ? "#dbf8e3" : "#ffe6ea",
           userSelect: "none"
@@ -99,7 +91,10 @@ export default function AdminPanel() {
       )}
 
       <section style={{ marginBottom: 40 }}>
-        <h2 style={{ fontWeight: 800, fontSize: "1.35em", marginBottom: 14, borderBottom: `2px solid ${accentColor}`, paddingBottom: 4 }}>
+        <h2 style={{
+          fontWeight: 800, fontSize: "1.35em", marginBottom: 14,
+          borderBottom: `2px solid ${accentColor}`, paddingBottom: 4
+        }}>
           Pending Fund Requests
         </h2>
         {payments.length === 0 ? (
@@ -136,8 +131,11 @@ export default function AdminPanel() {
       </section>
 
       <section>
-        <h2 style={{ fontWeight: 800, fontSize: "1.35em", marginBottom: 14, borderBottom: `2px solid ${accentColor}`, paddingBottom: 4 }}>
-          Action History
+        <h2 style={{
+          fontWeight: 800, fontSize: "1.35em", marginBottom: 14,
+          borderBottom: `2px solid ${accentColor}`, paddingBottom: 4
+        }}>
+          Action History (Cleared after 24 hours)
         </h2>
         {userHistory.length === 0 ? (
           <p style={{ color: "#666", fontStyle: "italic" }}>No action history available.</p>
@@ -145,12 +143,15 @@ export default function AdminPanel() {
           <div style={{ maxHeight: "55vh", overflowY: "auto" }}>
             {userHistory.map(h => (
               <div key={h.id} style={historyItemStyle}>
-                <div><b>{h.type.replace(/_/g, " ").toUpperCase()}</b> - {h.description}</div>
+                <div><b>{h.type.replace(/_/g, " ").toUpperCase()}</b> — {h.description}</div>
                 <div style={{ fontSize: "0.83em", color: "#555" }}>{new Date(h.timestamp).toLocaleString()}</div>
               </div>
             ))}
           </div>
         )}
+        <p style={{ fontSize: "0.85em", fontStyle: "italic", marginTop: 12, color: "#888" }}>
+          Note: History is stored temporarily and cleared automatically after 24 hours.
+        </p>
       </section>
     </div>
   );
