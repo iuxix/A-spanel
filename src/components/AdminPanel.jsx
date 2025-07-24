@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from "firebase/firestore";
 
-// Simple admin panel: Manage deposits approval
+const primaryColor = "#1b365d";
+const secondaryColor = "#2b539f";
+const accentColor = "#54c7ec";
+
 export default function AdminPanel() {
   const [deposits, setDeposits] = useState([]);
   const [loading, setLoading] = useState(false);
   const [actionMsg, setActionMsg] = useState("");
 
   useEffect(() => {
-    // Listen to all deposits with status 'pending'
     const q = query(collection(db, "deposits"), where("status", "==", "pending"));
     const unsub = onSnapshot(q, snapshot => {
       setDeposits(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
@@ -17,82 +19,96 @@ export default function AdminPanel() {
     return () => unsub();
   }, []);
 
-  // Approve deposit: update deposit status and increment user balance
   async function approveDeposit(dep) {
     setActionMsg("");
     setLoading(true);
     try {
-      // Update deposit status to accepted
       const depRef = doc(db, "deposits", dep.id);
       await updateDoc(depRef, { status: "accepted" });
 
-      // Increment user's balance
       const userRef = doc(db, "users", dep.user);
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
         const currentBalance = userSnap.data().balance || 0;
-        await updateDoc(userRef, {
-          balance: parseFloat(currentBalance) + parseFloat(dep.amount)
-        });
-      } else {
-        // User doc not found, create new with balance = amount (optional)
-        // await setDoc(userRef, { balance: dep.amount });
+        await updateDoc(userRef, { balance: currentBalance + dep.amount });
       }
-      setActionMsg(`✅ Deposit by user ${dep.user} approved and balance updated.`);
+      setActionMsg(`✅ Accepted deposit of ₹${dep.amount} by user: ${dep.username || dep.user}`);
     } catch (error) {
-      setActionMsg("❌ Error approving deposit: " + error.message);
+      setActionMsg(`❌ Error approving deposit: ${error.message}`);
     }
     setLoading(false);
   }
 
-  // Reject deposit: update deposit status to rejected
   async function rejectDeposit(dep) {
     setActionMsg("");
     setLoading(true);
     try {
       const depRef = doc(db, "deposits", dep.id);
       await updateDoc(depRef, { status: "rejected" });
-      setActionMsg(`❌ Deposit by user ${dep.user} rejected.`);
+      setActionMsg(`❌ Rejected deposit of ₹${dep.amount} by user: ${dep.username || dep.user}`);
     } catch (error) {
-      setActionMsg("❌ Error rejecting deposit: " + error.message);
+      setActionMsg(`❌ Error rejecting deposit: ${error.message}`);
     }
     setLoading(false);
   }
 
   return (
-    <div style={{ maxWidth: 780, margin: "auto", padding: 20, fontFamily: "Poppins,sans-serif" }}>
-      <h2 style={{ color: "#136cae" }}>Admin Panel - Manage Deposit Requests</h2>
-      {actionMsg && <div style={{ marginBottom: 15, fontWeight: "700", color: actionMsg.startsWith("✅") ? "#2eda7e" : "#e8274d" }}>{actionMsg}</div>}
+    <div style={{ maxWidth: 780, margin: "auto", padding: 32, fontFamily: "Poppins, sans-serif", color: primaryColor }}>
+      <h2 style={{ fontWeight: 900, fontSize: "1.7em", marginBottom: 24, borderBottom: `3px solid ${primaryColor}` }}>
+        Admin Panel - Deposit Requests
+      </h2>
+
+      {actionMsg && (
+        <div style={{
+          marginBottom: 24,
+          fontWeight: 700,
+          color: actionMsg.startsWith("✅") ? "#2e7d32" : "#d32f2f",
+          backgroundColor: actionMsg.startsWith("✅") ? "#d0f0c0" : "#ffd7d7",
+          padding: 14,
+          borderRadius: 10,
+          userSelect: "none"
+        }}>
+          {actionMsg}
+        </div>
+      )}
+
       {deposits.length === 0 ? (
-        <div style={{ fontSize: "1.1em", color: "#555", fontWeight: 600 }}>No pending deposit requests.</div>
+        <p style={{ fontSize: "1.2em", color: "#555" }}>No pending deposit requests.</p>
       ) : (
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ backgroundColor: "#0e58e9", color: "#fff" }}>
-              <th style={thStyle}>User ID</th>
-              <th style={thStyle}>Amount (₹)</th>
-              <th style={thStyle}>Proof File</th>
-              <th style={thStyle}>Date</th>
-              <th style={thStyle}>Actions</th>
+          <thead style={{ backgroundColor: secondaryColor, color: "#fff" }}>
+            <tr>
+              <th style={headerCellStyle}>User</th>
+              <th style={headerCellStyle}>Amount (₹)</th>
+              <th style={headerCellStyle}>Request Date</th>
+              <th style={headerCellStyle}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {deposits.map(dep => (
-              <tr key={dep.id} style={{ borderBottom: "1px solid #ddd" }}>
-                <td style={tdStyle}>{dep.user}</td>
-                <td style={tdStyle}>{dep.amount.toFixed(2)}</td>
-                <td style={tdStyle}>
-                  {dep.proofName ?
-                    <a href={`https://your-storage-url/${dep.proofName}`} target="_blank" rel="noreferrer" style={{ color: "#0e58e9" }}>
-                      {dep.proofName}
-                    </a> :
-                    "No proof"
-                  }
-                </td>
-                <td style={tdStyle}>{dep.created?.toDate ? dep.created.toDate().toLocaleString() : new Date(dep.created).toLocaleString()}</td>
-                <td style={tdStyle}>
-                  <button disabled={loading} onClick={() => approveDeposit(dep)} style={btnApproveStyle}>Accept</button>
-                  <button disabled={loading} onClick={() => rejectDeposit(dep)} style={btnRejectStyle}>Reject</button>
+              <tr key={dep.id} style={{ borderBottom: "1px solid #cfd8dc" }}>
+                <td style={cellStyle}>{dep.username || dep.user}</td>
+                <td style={cellStyle}>{dep.amount.toFixed(2)}</td>
+                <td style={cellStyle}>{dep.created?.toDate ? dep.created.toDate().toLocaleString() : new Date(dep.created).toLocaleString()}</td>
+                <td style={cellStyle}>
+                  <button
+                    onClick={() => approveDeposit(dep)}
+                    disabled={loading}
+                    style={approveBtnStyle}
+                    aria-label={`Accept deposit from ${dep.username || dep.user}`}
+                    type="button"
+                  >
+                    Accept
+                  </button>
+                  <button
+                    onClick={() => rejectDeposit(dep)}
+                    disabled={loading}
+                    style={rejectBtnStyle}
+                    aria-label={`Reject deposit from ${dep.username || dep.user}`}
+                    type="button"
+                  >
+                    Reject
+                  </button>
                 </td>
               </tr>
             ))}
@@ -103,33 +119,41 @@ export default function AdminPanel() {
   );
 }
 
-// Styles
-const thStyle = {
-  padding: "12px 10px",
+const headerCellStyle = {
+  padding: "12px 14px",
   fontWeight: "700",
+  fontSize: "1em",
+  textAlign: "left",
+  userSelect: "none"
+};
+
+const cellStyle = {
+  padding: "12px 14px",
   fontSize: "0.95em",
-  textAlign: "left"
+  color: primaryColor,
+  userSelect: "text",
+  verticalAlign: "middle"
 };
-const tdStyle = {
-  padding: "10px 10px",
-  fontSize: "0.9em"
-};
-const btnApproveStyle = {
-  background: "#2eda7e",
+
+const approveBtnStyle = {
+  backgroundColor: "#388e3c",
   border: "none",
-  color: "white",
-  padding: "7px 13px",
-  marginRight: 7,
-  borderRadius: 6,
+  color: "#fff",
   fontWeight: 700,
-  cursor: "pointer"
+  padding: "8px 16px",
+  borderRadius: 8,
+  marginRight: 12,
+  cursor: "pointer",
+  userSelect: "none"
 };
-const btnRejectStyle = {
-  background: "#e8274d",
+
+const rejectBtnStyle = {
+  backgroundColor: "#d32f2f",
   border: "none",
-  color: "white",
-  padding: "7px 13px",
-  borderRadius: 6,
+  color: "#fff",
   fontWeight: 700,
-  cursor: "pointer"
+  padding: "8px 16px",
+  borderRadius: 8,
+  cursor: "pointer",
+  userSelect: "none"
 };
