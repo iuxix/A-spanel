@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged, updateProfile, signOut } from "firebase/auth";
 import { db } from "../firebase";
 import {
-  collection, addDoc, onSnapshot, doc, query, where, deleteDoc, serverTimestamp
+  collection, addDoc, onSnapshot, doc, query, where, serverTimestamp
 } from "firebase/firestore";
 import {
   FaWallet, FaUser, FaChartLine, FaMoneyCheckAlt, FaEllipsisV, FaCogs,
@@ -55,25 +55,20 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [loadingFundsSubmit, setLoadingFundsSubmit] = useState(false);
 
-  // Sync user, balance, orders, payments (fund requests), history
   useEffect(() => {
     const auth = getAuth();
     const unsub = onAuthStateChanged(auth, usr => {
       setUser(usr);
       if (usr) {
-        // Get wallet balance
         onSnapshot(doc(db, "users", usr.uid), snap => {
           setBalance(snap.exists() && snap.data().balance ? snap.data().balance : 0);
         });
-        // Listen to orders
         onSnapshot(query(collection(db, "orders"), where("user", "==", usr.uid)), snap => {
           setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.timestamp - a.timestamp));
         });
-        // Listen to payments (fund requests by this user)
         onSnapshot(query(collection(db, "payments"), where("user", "==", usr.uid)), snap => {
           setPayments(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.created?.toMillis?.() - a.created?.toMillis?.()));
         });
-        // Listen to user history (actions log)
         onSnapshot(query(collection(db, "userHistory"), where("user", "==", usr.uid)), snap => {
           setHistory(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.timestamp - a.timestamp));
         });
@@ -116,11 +111,10 @@ export default function Dashboard() {
         cat,
         serviceTitle: svc.title
       });
-      // Log to userHistory
       await addDoc(collection(db, "userHistory"), {
         user: user.uid,
         type: "order",
-        description: `Placed order for ${svc.title} (Qty: ${q})`,
+        description: `Placed order: ${svc.title} ×${q}`,
         timestamp: Date.now()
       });
       setOrderMsg("✅ Order placed successfully! Track under My Orders.");
@@ -128,7 +122,7 @@ export default function Dashboard() {
       setLink("");
       setQty("");
       setCharge("0.00");
-    } catch (err) {
+    } catch {
       setOrderMsg("❌ Failed to place order. Please try again.");
     }
   }
@@ -138,7 +132,6 @@ export default function Dashboard() {
       if (newName) await updateProfile(getAuth().currentUser, { displayName: newName });
       if (newMail) await getAuth().currentUser.updateEmail(newMail);
       if (newPass) await getAuth().currentUser.updatePassword(newPass);
-      // Log profile change to userHistory
       await addDoc(collection(db, "userHistory"), {
         user: user.uid,
         type: "profile",
@@ -155,13 +148,11 @@ export default function Dashboard() {
     signOut(getAuth()).then(() => { window.location = "/"; });
   }
 
-  // Submit Add Funds request 
   async function handleAddFundsSubmit(amount, setMsg, resetInput) {
     setMsg("");
     if (!amount || Number(amount) < 30) return setMsg("❌ Enter at least ₹30.");
     setLoadingFundsSubmit(true);
     try {
-      // Save payment request to "payments"
       await addDoc(collection(db, "payments"), {
         user: user.uid,
         username: user.displayName || user.email || "Unknown",
@@ -169,14 +160,13 @@ export default function Dashboard() {
         status: "pending",
         created: serverTimestamp()
       });
-      // Log payment request to userHistory
       await addDoc(collection(db, "userHistory"), {
         user: user.uid,
         type: "payment_request",
         description: `Requested fund ₹${amount}`,
         timestamp: Date.now()
       });
-      setMsg("✅ Fund request sent! Await admin approval.");
+      setMsg("✅ Fund request sent! Awaiting admin approval.");
       resetInput();
     } catch {
       setMsg("❌ Submission failed. Please try again.");
@@ -264,12 +254,14 @@ export default function Dashboard() {
                     zIndex: 20,
                     minWidth: 190,
                     boxShadow: "0 6px 26px #2474df23",
+                    color: theme === "dark" ? "#fff" : menuTextColor,
+                    fontWeight: "700"
                   }}
                 >
                   <DropdownItem theme={theme} icon={<FaUserCircle />} label="Profile" onClick={() => { setShowProfile(true); setShowMenu(false); }} />
                   <DropdownItem theme={theme} icon={<FaWallet />} label="Add Funds" onClick={() => { setShowFunds(true); setShowMenu(false); }} />
                   <DropdownItem theme={theme} icon={<FaHistory />} label="My Orders" onClick={() => { setShowHistory(true); setShowMenu(false); }} />
-                  <DropdownItem theme={theme} icon={<FaHistory />} label="History" onClick={() => { setShowMenu(false); setShowHistory(true); }} />
+                  <DropdownItem theme={theme} icon={<FaHistory />} label="History" onClick={() => { setShowHistory(true); setShowMenu(false); }} />
                   <DropdownItem theme={theme} icon={<FaCogs />} label="Settings" onClick={() => { setShowSettings(true); setShowMenu(false); }} />
                   <DropdownItem theme={theme} icon={<FaPowerOff />} color="#d32f3e" label="Logout" onClick={handleLogout} />
                 </div>
@@ -441,13 +433,11 @@ export default function Dashboard() {
         </button>
       </form>
 
-      {/* Modals */}
       {showFunds && <AddFundsModal user={user} theme={theme} onClose={() => setShowFunds(false)} loading={loadingFundsSubmit} onSubmit={handleAddFundsSubmit} />}
       {showProfile && <ProfileModal user={user} onClose={() => setShowProfile(false)} />}
       {showHistory && <HistoryModal orders={orders} payments={payments} history={history} onClose={() => setShowHistory(false)} />}
       {showSettings && <SettingsModal user={user} onSave={handleProfileSave} onClose={() => setShowSettings(false)} />}
 
-      {/* Footer */}
       <footer style={{
         textAlign: "center",
         padding: "16px 0 6px",
@@ -467,6 +457,8 @@ export default function Dashboard() {
     </div>
   );
 }
+
+// Modals & components below
 
 function AddFundsModal({ user, theme, onClose, loading, onSubmit }) {
   const [amount, setAmount] = useState("");
@@ -588,35 +580,20 @@ function HistoryModal({ orders, payments, history, onClose }) {
       </section>
       <section>
         <h4>Other Actions</h4>
-        {history.length === 0 ? <p style={{ color: "#999", fontStyle: "italic" }}>No history yet.</p> :
+        {history.length === 0 ? <p style={{ color: "#999", fontStyle: "italic" }}>No other actions yet.</p> :
           history.filter(h => h.type !== "order" && h.type !== "payment_request").map(h => (
             <div key={h.id} style={historyItemStyle}>
               {h.description} <small style={{ color: "#555" }}>({new Date(h.timestamp).toLocaleString()})</small>
             </div>
           ))
         }
+        <p style={{ fontSize: "0.85em", fontStyle: "italic", marginTop: 12, color: "#888" }}>
+          Note: History is stored temporarily and cleared automatically after 24 hours.
+        </p>
       </section>
     </Modal>
   );
 }
-
-// Helper for status colors in history
-function statusColor(status) {
-  if(!status) return "#666";
-  if(status === "pending") return "#f0ad4e";
-  if(status === "completed" || status === "accepted") return "#43a047";
-  if(status === "rejected") return "#d32f2f";
-  return "#333";
-}
-
-const historyItemStyle = {
-  padding: "8px 12px",
-  backgroundColor: "#e8f0f9",
-  borderRadius: 10,
-  marginBottom: 8,
-  fontSize: "0.95em",
-  color: "#1a3a6f"
-};
 
 function ProfileModal({ user, onClose }) {
   return (
@@ -638,20 +615,22 @@ function SettingsModal({ user, onSave, onClose }) {
   const [pass, setPass] = useState("");
   const [info, setInfo] = useState("");
 
+  const textColor = "#2360af"; // brighter in soft blue theme
+
   return (
     <Modal title="Settings" onClose={onClose}>
       <form onSubmit={e => { e.preventDefault(); onSave(name, mail, pass, setInfo); }}>
         <div style={{ marginBottom: 13 }}>
-          <label style={{ fontWeight: 700 }}>Username</label>
-          <input style={inputBox("light")} value={name} onChange={e => setName(e.target.value)} />
+          <label style={{ fontWeight: 700, color: textColor }}>Username</label>
+          <input style={{ ...inputBox("light"), color: textColor, fontWeight: 700 }} value={name} onChange={e => setName(e.target.value)} />
         </div>
         <div style={{ marginBottom: 13 }}>
-          <label style={{ fontWeight: 700 }}>Email</label>
-          <input style={inputBox("light")} value={mail} onChange={e => setMail(e.target.value)} />
+          <label style={{ fontWeight: 700, color: textColor }}>Email</label>
+          <input style={{ ...inputBox("light"), color: textColor, fontWeight: 700 }} value={mail} onChange={e => setMail(e.target.value)} />
         </div>
         <div style={{ marginBottom: 20 }}>
-          <label style={{ fontWeight: 700 }}>Password</label>
-          <input style={inputBox("light")} type="password" value={pass} onChange={e => setPass(e.target.value)} />
+          <label style={{ fontWeight: 700, color: textColor }}>Password</label>
+          <input style={{ ...inputBox("light"), color: textColor, fontWeight: 700 }} type="password" value={pass} onChange={e => setPass(e.target.value)} />
         </div>
         <button style={{
           width: "100%",
@@ -663,7 +642,9 @@ function SettingsModal({ user, onSave, onClose }) {
           color: "#fff",
           fontSize: "1.13em",
           cursor: "pointer"
-        }}>Change Info</button>
+        }}>
+          Change Info
+        </button>
         {info && <div style={{ marginTop: 12, fontWeight: 700, color: info.startsWith("✅") ? "#2e7d32" : "#d32f2f" }}>{info}</div>}
       </form>
     </Modal>
