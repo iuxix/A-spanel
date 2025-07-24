@@ -11,7 +11,6 @@ import {
 import AddFundsModal from "./components/AddFundsModal.jsx"; // <-- IMPORTING THE NEW COMPONENT
 
 const categories = [
-const categories = [
     { value: "special-offers", label: "⭐ Special Offers & Deals" },
     { value: "ig-followers-guaranteed", label: "💎 Instagram Followers [Guaranteed]" },
     { value: "ig-followers-cheap", label: "➡ Instagram Followers [No-Guarantee]" },
