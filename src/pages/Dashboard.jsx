@@ -14,7 +14,6 @@ const categories = [
   { value: "ig-followers-new", label: "IG Followers New" },
   { value: "telegram", label: "Telegram" }
 ];
-
 const services = {
   "new-ig": [
     { id: "1572", title: "Instagram Reels Views [NoN~Drop | 10M/Day]", badge: "1572", badgeColor: "#0cb2ed", desc: "Start: Instant\nSpeed: 10M/Day", avgtime: "3 hours", min: 100, max: 1000000, price: 0.13 }
@@ -27,7 +26,6 @@ const services = {
     { id: "3011", title: "Telegram Post Views Auto", badge: "TG", badgeColor: "#15b6f1", desc: "Instant, non drop", avgtime: "1 hour", min: 100, max: 4000000, price: 0.02 }
   ]
 };
-
 const primaryColor = "#1b365d";
 const secondaryColor = "#2474df";
 const accentColor = "#36c2ff";
@@ -48,6 +46,7 @@ export default function Dashboard() {
   const [showMenu, setShowMenu] = useState(false);
   const [showFunds, setShowFunds] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showOrders, setShowOrders] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [orders, setOrders] = useState([]);
@@ -100,32 +99,28 @@ export default function Dashboard() {
     if (isNaN(q) || q < svc.min || q > svc.max) return setOrderMsg(`❌ Quantity must be between ${svc.min} and ${svc.max}.`);
     if (parseFloat(charge) > parseFloat(balance)) return setOrderMsg("❌ Insufficient balance. Please add funds.");
     if (!user) return setOrderMsg("❌ Please log in to place order.");
-    try {
-      await addDoc(collection(db, "orders"), {
-        user: user.uid,
-        service_id: svc.id,
-        link,
-        qty: q,
-        charge: parseFloat(charge),
-        timestamp: Date.now(),
-        status: "pending",
-        cat,
-        serviceTitle: svc.title
-      });
-      await addDoc(collection(db, "userHistory"), {
-        user: user.uid,
-        type: "order",
-        description: `Placed order: ${svc.title} ×${q}`,
-        timestamp: Date.now()
-      });
-      setOrderMsg("✅ Order placed successfully! Track under My Orders.");
-      setSvc(null);
-      setLink("");
-      setQty("");
-      setCharge("0.00");
-    } catch {
-      setOrderMsg("❌ Failed to place order. Please try again.");
-    }
+    await addDoc(collection(db, "orders"), {
+      user: user.uid,
+      service_id: svc.id,
+      link,
+      qty: q,
+      charge: parseFloat(charge),
+      timestamp: Date.now(),
+      status: "pending",
+      cat,
+      serviceTitle: svc.title
+    });
+    await addDoc(collection(db, "userHistory"), {
+      user: user.uid,
+      type: "order",
+      description: `Placed order: ${svc.title} ×${q}`,
+      timestamp: Date.now()
+    });
+    setOrderMsg("✅ Order placed successfully! Track under My Orders.");
+    setSvc(null);
+    setLink("");
+    setQty("");
+    setCharge("0.00");
   }
 
   async function handleProfileSave(newName, newMail, newPass, setInfoMsg) {
@@ -184,7 +179,6 @@ export default function Dashboard() {
       fontFamily: "Poppins, sans-serif",
       position: "relative"
     }}>
-      {/* NAVBAR */}
       <nav style={{
         background: theme === "dark" ? secondaryColor : "#fff",
         borderBottom: `2px solid ${accentColor}`,
@@ -229,7 +223,7 @@ export default function Dashboard() {
               <button
                 aria-label="Menu"
                 title="Menu"
-                onClick={() => setShowMenu(m => !m)}
+                onClick={() => setShowMenu((m) => !m)}
                 style={{
                   background: theme === "dark" ? menuBgDark : menuBg,
                   border: "1px solid #aecbeb",
@@ -241,6 +235,7 @@ export default function Dashboard() {
                   outline: showMenu ? `2px solid ${accentColor}` : "none",
                   userSelect: "none"
                 }}
+                type="button"
               >
                 <FaEllipsisV />
               </button>
@@ -259,12 +254,12 @@ export default function Dashboard() {
                     fontWeight: "700"
                   }}
                 >
-                  <DropdownItem theme={theme} icon={<FaUserCircle />} label="Profile" onClick={() => { setShowProfile(true); setShowMenu(false); }} />
-                  <DropdownItem theme={theme} icon={<FaWallet />} label="Add Funds" onClick={() => { setShowFunds(true); setShowMenu(false); }} />
-                  <DropdownItem theme={theme} icon={<FaHistory />} label="My Orders" onClick={() => { setShowHistory(true); setShowMenu(false); }} />
-                  <DropdownItem theme={theme} icon={<FaHistory />} label="History" onClick={() => { setShowHistory(true); setShowMenu(false); }} />
-                  <DropdownItem theme={theme} icon={<FaCogs />} label="Settings" onClick={() => { setShowSettings(true); setShowMenu(false); }} />
-                  <DropdownItem theme={theme} icon={<FaPowerOff />} color="#d32f3e" label="Logout" onClick={handleLogout} />
+                  <DropdownItem theme={theme} icon={<FaUserCircle />} label="Profile" onClick={() => { setShowMenu(false); setShowProfile(true); }} />
+                  <DropdownItem theme={theme} icon={<FaWallet />} label="Add Funds" onClick={() => { setShowMenu(false); setShowFunds(true); }} />
+                  <DropdownItem theme={theme} icon={<FaHistory />} label="My Orders" onClick={() => { setShowMenu(false); setShowOrders(true); }} />
+                  <DropdownItem theme={theme} icon={<FaHistory />} label="History" onClick={() => { setShowMenu(false); setShowHistory(true); }} />
+                  <DropdownItem theme={theme} icon={<FaCogs />} label="Settings" onClick={() => { setShowMenu(false); setShowSettings(true); }} />
+                  <DropdownItem theme={theme} icon={<FaPowerOff />} color="#d32f3e" label="Logout" onClick={() => { setShowMenu(false); handleLogout(); }} />
                 </div>
               )}
             </div>
@@ -272,7 +267,6 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      {/* Stats */}
       <section style={{
         maxWidth: 1080,
         margin: "28px auto 22px",
@@ -287,7 +281,6 @@ export default function Dashboard() {
         <StatCard theme={theme} icon={<FaMoneyCheckAlt />} label="Spent Balance" value={`₹0.00`} />
       </section>
 
-      {/* Short Banner */}
       <section style={{
         maxWidth: 720,
         margin: "0 auto 32px",
@@ -301,7 +294,6 @@ export default function Dashboard() {
         🌟 LucixFire Panel: Manage your SMM boosts effortlessly — fast, easy, reliable! 🚀✨
       </section>
 
-      {/* Main Order Form */}
       <form
         onSubmit={submitOrder}
         style={{
@@ -320,20 +312,9 @@ export default function Dashboard() {
           <button type="button" style={tabBtn(true, theme)}>🛒 New Order</button>
           <button type="button" style={tabBtn(false, theme)} onClick={() => setShowFunds(true)}>💵 Add Funds</button>
         </div>
-        <input
-          type="search"
-          placeholder="Search Services..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={searchInput(theme)}
-          autoComplete="off"
-        />
+        <input type="search" placeholder="Search Services..." value={search} onChange={e => setSearch(e.target.value)} style={searchInput(theme)} autoComplete="off" />
         <label style={smallLbl}>Category</label>
-        <select
-          value={cat}
-          onChange={e => { setCat(e.target.value); setSvc(null); setQty(""); setLink(""); }}
-          style={selectBox(theme)}
-        >
+        <select value={cat} onChange={e => { setCat(e.target.value); setSvc(null); setQty(""); setLink(""); }} style={selectBox(theme)}>
           {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
         </select>
         <label style={smallLbl}>Services</label>
@@ -346,8 +327,7 @@ export default function Dashboard() {
             setQty("");
             setLink("");
           }}
-          style={selectBox(theme)}
-        >
+          style={selectBox(theme)}>
           <option value="">Select Service</option>
           {filteredServices.map(s => (
             <option key={s.id} value={s.id}>
@@ -355,84 +335,45 @@ export default function Dashboard() {
             </option>
           ))}
         </select>
-        {svc && (
-          <>
-            <div style={descCard(theme)}>
-              <b style={{ color: accentColor, fontSize: ".98em" }}>
-                {svc.badge && (<span style={{
-                  background: svc.badgeColor,
-                  borderRadius: 7,
-                  color: "#fff",
-                  padding: "2px 9px",
-                  marginRight: 8,
-                  fontWeight: 700
-                }}>{svc.badge}</span>)}
-                {svc.title}
-              </b>
-              <pre style={{ marginTop: 7, color: "#7abef5", fontSize: ".95em", whiteSpace: "pre-wrap" }}>{svc.desc}</pre>
-            </div>
-            <div style={descCard(theme)}>
-              <b>Average Time</b><br />{svc.avgtime}
-            </div>
-            <div style={{ marginBottom: 7, fontWeight: 700, fontSize: ".97em", color: "#6e9ba5" }}>
-              Min: {svc.min} - Max: {svc.max}
-            </div>
-          </>
-        )}
-        <label style={smallLbl}>Link</label>
-        <input
-          type="url"
-          placeholder="Paste link"
-          value={link}
-          onChange={e => setLink(e.target.value)}
-          style={inputBox(theme)}
-          disabled={!svc}
-          required={!!svc}
-        />
-        <label style={smallLbl}>Quantity</label>
-        <input
-          type="number"
-          min={svc?.min || ""}
-          max={svc?.max || ""}
-          value={qty}
-          onChange={e => setQty(e.target.value.replace(/^0+/, ""))}
-          style={inputBox(theme)}
-          disabled={!svc}
-          required={!!svc}
-        />
-        <div style={descCard(theme)}>
-          <b>Charge</b><br />₹{charge}
-        </div>
-        {orderMsg && (
-          <div style={{
-            fontWeight: 700,
-            marginTop: 14,
-            textAlign: "center",
-            color: orderMsg.startsWith("✅") ? "#3ad97b" : "#f65d5d"
-          }}>
-            {orderMsg}
+        {svc && (<>
+          <div style={descCard(theme)}>
+            <b style={{ color: accentColor, fontSize: ".98em" }}>
+              {svc.badge && (<span style={{ background: svc.badgeColor, borderRadius: 7, color: "#fff", padding: "2px 9px", marginRight: 8, fontWeight: 700 }}>{svc.badge}</span>)}{svc.title}
+            </b>
+            <pre style={{ marginTop: 7, color: "#7abef5", fontSize: ".95em", whiteSpace: "pre-wrap" }}>{svc.desc}</pre>
           </div>
-        )}
-        <button
-          type="submit"
-          disabled={!svc || !qty || !link || charge === "0.00"}
-          style={{
-            marginTop: 17,
-            width: "100%",
-            background: `linear-gradient(90deg, ${accentColor}, ${secondaryColor})`,
-            color: "#fff",
-            fontWeight: 900,
-            fontSize: "1.12em",
-            padding: "14px 0",
-            borderRadius: 15,
-            border: "none",
-            cursor: (!svc || !qty || !link || charge === "0.00") ? "not-allowed" : "pointer",
-            userSelect: "none"
-          }}
-        >
+          <div style={descCard(theme)}><b>Average Time</b><br />{svc.avgtime}</div>
+          <div style={{ marginBottom: 7, fontWeight: 700, fontSize: ".97em", color: "#6e9ba5" }}>
+            Min: {svc.min} - Max: {svc.max}
+          </div>
+        </>)}
+        <label style={smallLbl}>Link</label>
+        <input type="url" placeholder="Paste link" value={link} onChange={e => setLink(e.target.value)} style={inputBox(theme)} disabled={!svc} required={!!svc} />
+        <label style={smallLbl}>Quantity</label>
+        <input type="number" min={svc?.min || ""} max={svc?.max || ""} value={qty} onChange={e => setQty(e.target.value.replace(/^0+/, ""))} style={inputBox(theme)} disabled={!svc} required={!!svc} />
+        <div style={descCard(theme)}><b>Charge</b><br />₹{charge}</div>
+        {orderMsg && (<div style={{ fontWeight: 700, marginTop: 14, textAlign: "center", color: orderMsg.startsWith("✅") ? "#3ad97b" : "#f65d5d" }}>{orderMsg}</div>)}
+        <button type="submit" disabled={!svc || !qty || !link || charge === "0.00"} style={{
+          marginTop: 17, width: "100%", background: `linear-gradient(90deg, ${accentColor}, ${secondaryColor})`,
+          color: "#fff", fontWeight: 900, fontSize: "1.12em", padding: "14px 0", borderRadius: 15, border: "none",
+          cursor: (!svc || !qty || !link || charge === "0.00") ? "not-allowed" : "pointer", userSelect: "none"
+        }}>
           <FaWhatsapp style={{ fontSize: "1.21em" }} /> Place Order
         </button>
       </form>
+
+      {showFunds && <AddFundsModal user={user} theme={theme} onClose={() => setShowFunds(false)} loading={loadingFundsSubmit} onSubmit={handleAddFundsSubmit} />}
+      {showProfile && <ProfileModal user={user} onClose={() => setShowProfile(false)} />}
+      {showOrders && <OrdersModal orders={orders} onClose={() => setShowOrders(false)} />}
+      {showHistory && <HistoryModal orders={orders} payments={payments} history={history} onClose={() => setShowHistory(false)} />}
+      {showSettings && <SettingsModal user={user} onSave={handleProfileSave} onClose={() => setShowSettings(false)} />}
+
+      <footer style={{
+        textAlign: "center", padding: "16px 0 6px", fontSize: "0.98em", color: "#7baad3", borderTop: `1px solid ${accentColor}`,
+        background: "transparent", position: "fixed", left: 0, bottom: 0, width: "100%", zIndex: 80, userSelect: "none"
+      }}>
+        © {new Date().getFullYear()} LucixFire Panel. All rights reserved.
+      </footer>
     </div>
   );
 }
@@ -532,6 +473,38 @@ function AddFundsModal({ user, theme, onClose, loading, onSubmit }) {
   );
 }
 
+function OrdersModal({ orders, onClose }) {
+  return (
+    <Modal title="My Orders" onClose={onClose}>
+      {orders.length === 0 ? (
+        <p style={{ color: "#919ab2", fontStyle: "italic", textAlign: "center", margin: 24 }}>No orders placed yet.</p>
+      ) : (
+        <div style={{ maxHeight: "60vh", overflowY: "auto", paddingRight: 6 }}>
+          {orders.map(o => (
+            <div key={o.id} style={{
+              border: `2px solid ${accentColor}`,
+              borderRadius: 14,
+              padding: 13,
+              marginBottom: 14,
+              fontSize: "0.98em",
+              background: "#f1fdff",
+              color: secondaryColor,
+              boxShadow: "0 2px 15px #36c2ff16"
+            }}>
+              <div><b>Order ID:</b> {o.id}</div>
+              <div><b>Service:</b> {o.serviceTitle || o.service_id}</div>
+              <div><b>Qty:</b> {o.qty}</div>
+              <div><b>Link:</b> <a href={o.link} style={{ color: accentColor }} target="_blank" rel="noreferrer">{o.link}</a></div>
+              <div><b>Price:</b> ₹{o.charge.toFixed(2)}</div>
+              <div><b>Status:</b> <span style={{ color: statusColor(o.status), fontWeight: 700 }}>{o.status}</span></div>
+            </div>
+          ))}
+        </div>
+      )}
+    </Modal>
+  );
+}
+
 function HistoryModal({ orders, payments, history, onClose }) {
   return (
     <Modal title="History" onClose={onClose}>
@@ -550,7 +523,7 @@ function HistoryModal({ orders, payments, history, onClose }) {
         {payments.length === 0 ? <p style={{ color: "#999", fontStyle: "italic" }}>No fund requests.</p> :
           payments.map(p => (
             <div key={p.id} style={historyItemStyle}>
-              Requested: ₹{p.amount.toFixed(2)} - Status: <span style={{ fontWeight: "bold", color: statusColor(p.status) }}>{p.status || 'pending'}</span>
+              Requested: ₹{p.amount.toFixed(2)} - Status: <span style={{ fontWeight: "bold", color: statusColor(p.status || 'pending') }}>{p.status || 'pending'}</span>
             </div>
           ))
         }
@@ -591,7 +564,6 @@ function SettingsModal({ user, onSave, onClose }) {
   const [mail, setMail] = useState(user?.email || "");
   const [pass, setPass] = useState("");
   const [info, setInfo] = useState("");
-
   const textColor = "#2360af";
 
   return (
@@ -753,7 +725,6 @@ const searchInput = theme => ({
   border: `1.5px solid ${accentColor}`,
   marginBottom: 13
 });
-
 function statusColor(status) {
   if (!status) return "#666";
   if (status === "pending") return "#f0ad4e";
@@ -761,3 +732,11 @@ function statusColor(status) {
   if (status === "rejected") return "#d32f2f";
   return "#333";
 }
+const historyItemStyle = {
+  padding: "8px 12px",
+  backgroundColor: "#e8f0f9",
+  borderRadius: 10,
+  marginBottom: 8,
+  fontSize: "0.95em",
+  color: "#1a3a6f"
+};
