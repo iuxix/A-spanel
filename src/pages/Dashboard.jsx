@@ -8,6 +8,7 @@ import {
   FaWallet, FaUser, FaChartLine, FaMoneyCheckAlt, FaEllipsisV, FaCogs,
   FaUserCircle, FaHistory, FaWhatsapp, FaMoon, FaSun, FaPowerOff
 } from "react-icons/fa";
+import AddFundsModal from "./components/AddFundsModal"; // <-- IMPORTING THE NEW COMPONENT
 
 const categories = [
   { value: "new-ig", label: "⭐ New IG Services 😎⭐" },
@@ -378,101 +379,6 @@ export default function Dashboard() {
   );
 }
 
-function AddFundsModal({ user, theme, onClose, loading, onSubmit }) {
-  const [amount, setAmount] = useState("");
-  const [msg, setMsg] = useState("");
-
-  function resetInput() {
-    setAmount("");
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setMsg("");
-    await onSubmit(amount, setMsg, resetInput);
-  }
-
-  return (
-    <Modal title="Add Funds" onClose={onClose}>
-      <div style={{
-        fontWeight: 700,
-        color: "#18c332",
-        marginBottom: 8,
-        textAlign: "center",
-        backgroundColor: "#e8fff3",
-        borderRadius: 8,
-        padding: "9px",
-        userSelect: "none"
-      }}>
-        🎁 Deposit above <b>₹100</b> gets you instant <b>10% bonus</b>!
-      </div>
-      <div style={{
-        fontWeight: 600,
-        color: "#228edc",
-        textAlign: "center",
-        marginBottom: 8,
-        userSelect: "none"
-      }}>UPI: <span style={{ color: "#2884f6", fontWeight: 900 }}>boraxdealer@fam</span></div>
-      <img src="https://files.catbox.moe/xva1pb.jpg" alt="UPI QR" style={{ width: 140, borderRadius: 13, display: "block", margin: "12px auto 14px", background: "#fff" }} />
-      <ol style={{ color: "#5993b2", marginBottom: 10, paddingLeft: 17, fontSize: "0.91em", userSelect: "none" }}>
-        <li>Pay with above UPI or QR code.</li>
-        <li>Submit the paid amount (min ₹30).</li>
-        <li>Admin will accept your request soon.</li>
-      </ol>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="number"
-          min={30}
-          placeholder="Enter Amount (₹30+)"
-          style={{
-            width: "100%",
-            padding: "13px 10px",
-            marginBottom: 11,
-            borderRadius: 8,
-            border: "1.3px solid #c2eafc",
-            fontWeight: 700,
-            userSelect: "text"
-          }}
-          value={amount}
-          onChange={e => setAmount(e.target.value.replace(/^0+/, ""))}
-          disabled={loading}
-          required
-          autoComplete="off"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: "100%",
-            padding: "13px 0",
-            margin: "6px 0 2px",
-            borderRadius: 8,
-            fontWeight: 900,
-            border: "none",
-            background: loading ? "#badfff" : "linear-gradient(90deg,#34b992,#1e78e8)",
-            color: "#fff",
-            fontSize: "1.09em",
-            cursor: loading ? "progress" : "pointer",
-            userSelect: "none"
-          }}
-        >
-          {loading ? "Submitting..." : "Submit"}
-        </button>
-        {msg && (
-          <div style={{
-            marginTop: 10,
-            fontWeight: 700,
-            textAlign: "center",
-            color: msg.startsWith("✅") ? "#1fb963" : "#e75d74"
-          }}>
-            {msg}
-          </div>
-        )}
-      </form>
-    </Modal>
-  );
-}
-
 function OrdersModal({ orders, onClose }) {
   return (
     <Modal title="My Orders" onClose={onClose}>
@@ -481,16 +387,7 @@ function OrdersModal({ orders, onClose }) {
       ) : (
         <div style={{ maxHeight: "60vh", overflowY: "auto", paddingRight: 6 }}>
           {orders.map(o => (
-            <div key={o.id} style={{
-              border: `2px solid ${accentColor}`,
-              borderRadius: 14,
-              padding: 13,
-              marginBottom: 14,
-              fontSize: "0.98em",
-              background: "#f1fdff",
-              color: secondaryColor,
-              boxShadow: "0 2px 15px #36c2ff16"
-            }}>
+            <div key={o.id} style={historyItemStyle}>
               <div><b>Order ID:</b> {o.id}</div>
               <div><b>Service:</b> {o.serviceTitle || o.service_id}</div>
               <div><b>Qty:</b> {o.qty}</div>
