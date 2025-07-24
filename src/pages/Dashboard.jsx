@@ -8,7 +8,7 @@ import {
   FaWallet, FaUser, FaChartLine, FaMoneyCheckAlt, FaEllipsisV, FaCogs,
   FaUserCircle, FaHistory, FaWhatsapp, FaMoon, FaSun, FaPowerOff
 } from "react-icons/fa";
-import AddFundsModal from "./components/AddFundsModal"; // <-- IMPORTING THE NEW COMPONENT
+import AddFundsModal from "./components/AddFundsModal.jsx"; // <-- IMPORTING THE NEW COMPONENT
 
 const categories = [
 const categories = [
