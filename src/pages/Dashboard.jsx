@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged, updateProfile, signOut } from "firebase/auth";
 import { db } from "../firebase";
-import { collection, addDoc, onSnapshot, doc, query, where } from "firebase/firestore";
 import {
-  FaWallet, FaUser, FaChartLine, FaMoneyCheckAlt, FaEllipsisV,
-  FaCogs, FaUserCircle, FaHistory, FaWhatsapp, FaMoon, FaSun, FaPowerOff
+  collection, addDoc, onSnapshot, doc, query, where, deleteDoc, serverTimestamp
+} from "firebase/firestore";
+import {
+  FaWallet, FaUser, FaChartLine, FaMoneyCheckAlt, FaEllipsisV, FaCogs,
+  FaUserCircle, FaHistory, FaWhatsapp, FaMoon, FaSun, FaPowerOff
 } from "react-icons/fa";
 
 const categories = [
@@ -24,13 +26,13 @@ const services = {
     { id: "3011", title: "Telegram Post Views Auto", badge: "TG", badgeColor: "#15b6f1", desc: "Instant, non drop", avgtime: "1 hour", min: 100, max: 4000000, price: 0.02 }
   ]
 };
-const primaryColor = "#193357";
+
+const primaryColor = "#1b365d";
 const secondaryColor = "#2474df";
 const accentColor = "#36c2ff";
 const menuBg = "#f3f8fb";
 const menuBgDark = "#1a355d";
 const menuTextColor = "#193357";
-const menuTextHighlight = "#228edc";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -48,19 +50,33 @@ export default function Dashboard() {
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [orders, setOrders] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [history, setHistory] = useState([]);
   const [search, setSearch] = useState("");
   const [loadingFundsSubmit, setLoadingFundsSubmit] = useState(false);
 
+  // Sync user, balance, orders, payments (fund requests), history
   useEffect(() => {
     const auth = getAuth();
     const unsub = onAuthStateChanged(auth, usr => {
       setUser(usr);
       if (usr) {
-        onSnapshot(doc(db, "users", usr.uid), d =>
-          setBalance(d.exists() && d.data().balance ? d.data().balance : 0));
-        onSnapshot(query(collection(db, "orders"), where("user", "==", usr.uid)), snap =>
-          setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => b.timestamp - a.timestamp))
-        );
+        // Get wallet balance
+        onSnapshot(doc(db, "users", usr.uid), snap => {
+          setBalance(snap.exists() && snap.data().balance ? snap.data().balance : 0);
+        });
+        // Listen to orders
+        onSnapshot(query(collection(db, "orders"), where("user", "==", usr.uid)), snap => {
+          setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.timestamp - a.timestamp));
+        });
+        // Listen to payments (fund requests by this user)
+        onSnapshot(query(collection(db, "payments"), where("user", "==", usr.uid)), snap => {
+          setPayments(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.created?.toMillis?.() - a.created?.toMillis?.()));
+        });
+        // Listen to user history (actions log)
+        onSnapshot(query(collection(db, "userHistory"), where("user", "==", usr.uid)), snap => {
+          setHistory(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.timestamp - a.timestamp));
+        });
       }
     });
     return unsub;
@@ -85,9 +101,9 @@ export default function Dashboard() {
     setOrderMsg("");
     if (!svc || !qty || !link) return setOrderMsg("❌ Fill every field.");
     const q = parseInt(qty, 10);
-    if (isNaN(q) || q < svc.min || q > svc.max) return setOrderMsg(`❌ Quantity: ${svc.min} - ${svc.max}`);
-    if (parseFloat(charge) > parseFloat(balance)) return setOrderMsg("❌ Not enough balance.");
-    if (!user) return setOrderMsg("❌ Login required.");
+    if (isNaN(q) || q < svc.min || q > svc.max) return setOrderMsg(`❌ Quantity must be between ${svc.min} and ${svc.max}.`);
+    if (parseFloat(charge) > parseFloat(balance)) return setOrderMsg("❌ Insufficient balance. Please add funds.");
+    if (!user) return setOrderMsg("❌ Please log in to place order.");
     try {
       await addDoc(collection(db, "orders"), {
         user: user.uid,
@@ -100,10 +116,20 @@ export default function Dashboard() {
         cat,
         serviceTitle: svc.title
       });
-      setOrderMsg("✅ Order placed! Track it in My Orders.");
-      setSvc(null); setLink(""); setQty(""); setCharge("0.00");
-    } catch {
-      setOrderMsg("❌ Failed. Try again.");
+      // Log to userHistory
+      await addDoc(collection(db, "userHistory"), {
+        user: user.uid,
+        type: "order",
+        description: `Placed order for ${svc.title} (Qty: ${q})`,
+        timestamp: Date.now()
+      });
+      setOrderMsg("✅ Order placed successfully! Track under My Orders.");
+      setSvc(null);
+      setLink("");
+      setQty("");
+      setCharge("0.00");
+    } catch (err) {
+      setOrderMsg("❌ Failed to place order. Please try again.");
     }
   }
 
@@ -112,7 +138,14 @@ export default function Dashboard() {
       if (newName) await updateProfile(getAuth().currentUser, { displayName: newName });
       if (newMail) await getAuth().currentUser.updateEmail(newMail);
       if (newPass) await getAuth().currentUser.updatePassword(newPass);
-      setInfoMsg("✅ Profile updated.");
+      // Log profile change to userHistory
+      await addDoc(collection(db, "userHistory"), {
+        user: user.uid,
+        type: "profile",
+        description: "Updated profile info",
+        timestamp: Date.now()
+      });
+      setInfoMsg("✅ Profile updated successfully!");
     } catch (err) {
       setInfoMsg("❌ " + err.message);
     }
@@ -122,23 +155,31 @@ export default function Dashboard() {
     signOut(getAuth()).then(() => { window.location = "/"; });
   }
 
-  // FIXED AddFunds Modal Submit with success/error message
+  // Submit Add Funds request 
   async function handleAddFundsSubmit(amount, setMsg, resetInput) {
     setMsg("");
     if (!amount || Number(amount) < 30) return setMsg("❌ Enter at least ₹30.");
     setLoadingFundsSubmit(true);
     try {
-      await addDoc(collection(db, "deposits"), {
+      // Save payment request to "payments"
+      await addDoc(collection(db, "payments"), {
         user: user.uid,
         username: user.displayName || user.email || "Unknown",
         amount: Number(amount),
         status: "pending",
-        created: new Date()
+        created: serverTimestamp()
       });
-      setMsg("✅ Request sent! Admin will process it soon.");
+      // Log payment request to userHistory
+      await addDoc(collection(db, "userHistory"), {
+        user: user.uid,
+        type: "payment_request",
+        description: `Requested fund ₹${amount}`,
+        timestamp: Date.now()
+      });
+      setMsg("✅ Fund request sent! Await admin approval.");
       resetInput();
     } catch {
-      setMsg("❌ Submission failed. Try again.");
+      setMsg("❌ Submission failed. Please try again.");
     }
     setLoadingFundsSubmit(false);
   }
@@ -177,7 +218,7 @@ export default function Dashboard() {
             <img src="/logo.png" alt="Logo" style={{ height: 38, borderRadius: 22 }} />
             LucixFire Panel
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 17 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <button
               title="Toggle Theme"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -186,7 +227,8 @@ export default function Dashboard() {
                 fontSize: "1.3em",
                 background: "none",
                 border: "none",
-                cursor: "pointer"
+                cursor: "pointer",
+                userSelect: "none"
               }}
             >
               {theme === "dark" ? <FaSun /> : <FaMoon />}
@@ -194,18 +236,19 @@ export default function Dashboard() {
             <img src="/logo.png" alt="User Avatar" style={{ height: 32, width: 32, borderRadius: "50%" }} />
             <div style={{ position: "relative" }}>
               <button
-                onClick={() => setShowMenu(m => !m)}
                 aria-label="Menu"
+                title="Menu"
+                onClick={() => setShowMenu(m => !m)}
                 style={{
                   background: theme === "dark" ? menuBgDark : menuBg,
                   border: "1px solid #aecbeb",
                   color: theme === "dark" ? "#fff" : menuTextColor,
-                  fontSize: "1.52em",
-                  padding: "7px 12px",
+                  fontSize: "1.6em",
+                  padding: "6px 14px",
                   borderRadius: 20,
                   cursor: "pointer",
                   outline: showMenu ? `2px solid ${accentColor}` : "none",
-                  transition: "background 0.2s, color 0.2s"
+                  userSelect: "none"
                 }}
               >
                 <FaEllipsisV />
@@ -214,18 +257,19 @@ export default function Dashboard() {
                 <div
                   style={{
                     background: theme === "dark" ? menuBgDark : menuBg,
-                    borderRadius: 17,
+                    borderRadius: 16,
                     position: "absolute",
                     top: 40,
                     right: 0,
                     zIndex: 20,
-                    minWidth: 180,
-                    boxShadow: "0 6px 26px #2474df23"
+                    minWidth: 190,
+                    boxShadow: "0 6px 26px #2474df23",
                   }}
                 >
                   <DropdownItem theme={theme} icon={<FaUserCircle />} label="Profile" onClick={() => { setShowProfile(true); setShowMenu(false); }} />
                   <DropdownItem theme={theme} icon={<FaWallet />} label="Add Funds" onClick={() => { setShowFunds(true); setShowMenu(false); }} />
                   <DropdownItem theme={theme} icon={<FaHistory />} label="My Orders" onClick={() => { setShowHistory(true); setShowMenu(false); }} />
+                  <DropdownItem theme={theme} icon={<FaHistory />} label="History" onClick={() => { setShowMenu(false); setShowHistory(true); }} />
                   <DropdownItem theme={theme} icon={<FaCogs />} label="Settings" onClick={() => { setShowSettings(true); setShowMenu(false); }} />
                   <DropdownItem theme={theme} icon={<FaPowerOff />} color="#d32f3e" label="Logout" onClick={handleLogout} />
                 </div>
@@ -250,7 +294,7 @@ export default function Dashboard() {
         <StatCard theme={theme} icon={<FaMoneyCheckAlt />} label="Spent Balance" value={`₹0.00`} />
       </section>
 
-      {/* Short, Emoji Rich Banner */}
+      {/* Short Banner */}
       <section style={{
         maxWidth: 720,
         margin: "0 auto 32px",
@@ -258,9 +302,10 @@ export default function Dashboard() {
         textAlign: "center",
         fontWeight: 600,
         fontSize: "1.09em",
-        color: secondaryColor
+        color: secondaryColor,
+        userSelect: "none"
       }}>
-        🌟 LucixFire Panel: Manage all your SMM boosts in one place — fast, easy, trusted! 🚀✨
+        🌟 LucixFire Panel: Manage your SMM boosts effortlessly — fast, easy, reliable! 🚀✨
       </section>
 
       {/* Main Order Form */}
@@ -331,7 +376,7 @@ export default function Dashboard() {
                 }}>{svc.badge}</span>)}
                 {svc.title}
               </b>
-              <pre style={{ marginTop: 7, color: "#7abef5", fontSize: ".95em", whiteSpace: "pre-wrap"}}>{svc.desc}</pre>
+              <pre style={{ marginTop: 7, color: "#7abef5", fontSize: ".95em", whiteSpace: "pre-wrap" }}>{svc.desc}</pre>
             </div>
             <div style={descCard(theme)}>
               <b>Average Time</b><br />{svc.avgtime}
@@ -388,7 +433,8 @@ export default function Dashboard() {
             padding: "14px 0",
             borderRadius: 15,
             border: "none",
-            cursor: (!svc || !qty || !link || charge === "0.00") ? "not-allowed" : "pointer"
+            cursor: (!svc || !qty || !link || charge === "0.00") ? "not-allowed" : "pointer",
+            userSelect: "none"
           }}
         >
           <FaWhatsapp style={{ fontSize: "1.21em" }} /> Place Order
@@ -398,7 +444,7 @@ export default function Dashboard() {
       {/* Modals */}
       {showFunds && <AddFundsModal user={user} theme={theme} onClose={() => setShowFunds(false)} loading={loadingFundsSubmit} onSubmit={handleAddFundsSubmit} />}
       {showProfile && <ProfileModal user={user} onClose={() => setShowProfile(false)} />}
-      {showHistory && <HistoryModal orders={orders} onClose={() => setShowHistory(false)} />}
+      {showHistory && <HistoryModal orders={orders} payments={payments} history={history} onClose={() => setShowHistory(false)} />}
       {showSettings && <SettingsModal user={user} onSave={handleProfileSave} onClose={() => setShowSettings(false)} />}
 
       {/* Footer */}
@@ -413,7 +459,8 @@ export default function Dashboard() {
         left: 0,
         bottom: 0,
         width: "100%",
-        zIndex: 80
+        zIndex: 80,
+        userSelect: "none"
       }}>
         © {new Date().getFullYear()} LucixFire Panel. All rights reserved.
       </footer>
@@ -444,7 +491,8 @@ function AddFundsModal({ user, theme, onClose, loading, onSubmit }) {
         textAlign: "center",
         backgroundColor: "#e8fff3",
         borderRadius: 8,
-        padding: "9px"
+        padding: "9px",
+        userSelect: "none"
       }}>
         🎁 Deposit above <b>₹100</b> gets you instant <b>10% bonus</b>!
       </div>
@@ -452,10 +500,11 @@ function AddFundsModal({ user, theme, onClose, loading, onSubmit }) {
         fontWeight: 600,
         color: "#228edc",
         textAlign: "center",
-        marginBottom: 8
+        marginBottom: 8,
+        userSelect: "none"
       }}>UPI: <span style={{ color: "#2884f6", fontWeight: 900 }}>boraxdealer@fam</span></div>
       <img src="https://files.catbox.moe/xva1pb.jpg" alt="UPI QR" style={{ width: 140, borderRadius: 13, display: "block", margin: "12px auto 14px", background: "#fff" }} />
-      <ol style={{ color: "#5993b2", marginBottom: 10, paddingLeft: 17, fontSize: "0.91em" }}>
+      <ol style={{ color: "#5993b2", marginBottom: 10, paddingLeft: 17, fontSize: "0.91em", userSelect: "none" }}>
         <li>Pay with above UPI or QR code.</li>
         <li>Submit the paid amount (min ₹30).</li>
         <li>Admin accepts or rejects your request soon.</li>
@@ -471,11 +520,14 @@ function AddFundsModal({ user, theme, onClose, loading, onSubmit }) {
             marginBottom: 11,
             borderRadius: 8,
             border: "1.3px solid #c2eafc",
-            fontWeight: 700
+            fontWeight: 700,
+            userSelect: "text"
           }}
           value={amount}
           onChange={e => setAmount(e.target.value.replace(/^0+/, ""))}
           disabled={loading}
+          required
+          autoComplete="off"
         />
         <button
           type="submit"
@@ -490,7 +542,8 @@ function AddFundsModal({ user, theme, onClose, loading, onSubmit }) {
             background: loading ? "#badfff" : "linear-gradient(90deg,#34b992,#1e78e8)",
             color: "#fff",
             fontSize: "1.09em",
-            cursor: loading ? "progress" : "pointer"
+            cursor: loading ? "progress" : "pointer",
+            userSelect: "none"
           }}
         >
           {loading ? "Submitting..." : "Submit"}
@@ -510,12 +563,67 @@ function AddFundsModal({ user, theme, onClose, loading, onSubmit }) {
   );
 }
 
+function HistoryModal({ orders, payments, history, onClose }) {
+  return (
+    <Modal title="History" onClose={onClose}>
+      <section style={{ marginBottom: 18 }}>
+        <h4>Orders</h4>
+        {orders.length === 0 ? <p style={{ color: "#999", fontStyle: "italic" }}>No orders yet.</p> :
+          orders.map(o => (
+            <div key={o.id} style={historyItemStyle}>
+              <b>{o.serviceTitle || o.service_id}</b> - Qty: {o.qty} - ₹{o.charge.toFixed(2)} - Status: <span style={{ fontWeight: "bold", color: statusColor(o.status) }}>{o.status}</span>
+            </div>
+          ))
+        }
+      </section>
+      <section style={{ marginBottom: 18 }}>
+        <h4>Fund Requests</h4>
+        {payments.length === 0 ? <p style={{ color: "#999", fontStyle: "italic" }}>No fund requests.</p> :
+          payments.map(p => (
+            <div key={p.id} style={historyItemStyle}>
+              Requested: ₹{p.amount.toFixed(2)} - Status: <span style={{ fontWeight: "bold", color: statusColor(p.status) }}>{p.status}</span>
+            </div>
+          ))
+        }
+      </section>
+      <section>
+        <h4>Other Actions</h4>
+        {history.length === 0 ? <p style={{ color: "#999", fontStyle: "italic" }}>No history yet.</p> :
+          history.filter(h => h.type !== "order" && h.type !== "payment_request").map(h => (
+            <div key={h.id} style={historyItemStyle}>
+              {h.description} <small style={{ color: "#555" }}>({new Date(h.timestamp).toLocaleString()})</small>
+            </div>
+          ))
+        }
+      </section>
+    </Modal>
+  );
+}
+
+// Helper for status colors in history
+function statusColor(status) {
+  if(!status) return "#666";
+  if(status === "pending") return "#f0ad4e";
+  if(status === "completed" || status === "accepted") return "#43a047";
+  if(status === "rejected") return "#d32f2f";
+  return "#333";
+}
+
+const historyItemStyle = {
+  padding: "8px 12px",
+  backgroundColor: "#e8f0f9",
+  borderRadius: 10,
+  marginBottom: 8,
+  fontSize: "0.95em",
+  color: "#1a3a6f"
+};
+
 function ProfileModal({ user, onClose }) {
   return (
     <Modal title="Profile" onClose={onClose}>
       <div style={{ textAlign: "center", padding: 14 }}>
-        <img src="/logo.png" alt="User Avatar" style={{ height: 62, width: 62, borderRadius: 19, background: "transparent", marginBottom: 10 }} />
-        <div style={{ fontWeight: 800, fontSize: "1.1em", marginBottom: 2, color: secondaryColor }}>
+        <img src="/logo.png" alt="User Avatar" style={{ height: 62, width: 62, borderRadius: 19, marginBottom: 10 }} />
+        <div style={{ fontWeight: 800, fontSize: "1.1em", color: secondaryColor }}>
           {user?.displayName || user?.email || "Guest"}
         </div>
         <div style={{ color: accentColor, fontWeight: 600 }}>LuciXFire User</div>
@@ -523,44 +631,13 @@ function ProfileModal({ user, onClose }) {
     </Modal>
   );
 }
-function HistoryModal({ orders, onClose }) {
-  return (
-    <Modal title="My Orders" onClose={onClose}>
-      {orders.length === 0 ? (
-        <p style={{ color: "#919ab2", fontStyle: "italic", textAlign: "center", margin: 24 }}>
-          No orders placed yet.
-        </p>
-      ) : (
-        <div style={{ maxHeight: "60vh", overflowY: "auto", paddingRight: 6 }}>
-          {orders.map(o => (
-            <div key={o.id} style={{
-              border: `2px solid ${accentColor}`,
-              borderRadius: 14,
-              padding: 13,
-              marginBottom: 14,
-              fontSize: "0.98em",
-              background: "#f1fdff",
-              color: secondaryColor,
-              boxShadow: "0 2px 15px #36c2ff16"
-            }}>
-              <div><b>Order ID:</b> {o.id}</div>
-              <div><b>Service:</b> {o.serviceTitle || o.service_id}</div>
-              <div><b>Qty:</b> {o.qty}</div>
-              <div><b>Link:</b> <a href={o.link} style={{ color: accentColor }} target="_blank" rel="noreferrer">{o.link}</a></div>
-              <div><b>Price:</b> ₹{o.charge.toFixed(2)}</div>
-              <div><b>Status:</b> <span style={{ color: o.status === "pending" ? "#f0ad4e" : o.status === "completed" ? "#43a047" : "#d32f2f", fontWeight: 700 }}>{o.status}</span></div>
-            </div>
-          ))}
-        </div>
-      )}
-    </Modal>
-  );
-}
+
 function SettingsModal({ user, onSave, onClose }) {
   const [name, setName] = useState(user?.displayName || "");
   const [mail, setMail] = useState(user?.email || "");
   const [pass, setPass] = useState("");
   const [info, setInfo] = useState("");
+
   return (
     <Modal title="Settings" onClose={onClose}>
       <form onSubmit={e => { e.preventDefault(); onSave(name, mail, pass, setInfo); }}>
@@ -584,21 +661,20 @@ function SettingsModal({ user, onSave, onClose }) {
           border: "none",
           background: `linear-gradient(90deg, ${accentColor}, ${secondaryColor})`,
           color: "#fff",
-          fontSize: "1.13em"
+          fontSize: "1.13em",
+          cursor: "pointer"
         }}>Change Info</button>
-        {info && (
-          <div style={{ marginTop: 12, fontWeight: 700, color: info.startsWith("✅") ? "#2e7d32" : "#d32f2f" }}>
-            {info}
-          </div>
-        )}
+        {info && <div style={{ marginTop: 12, fontWeight: 700, color: info.startsWith("✅") ? "#2e7d32" : "#d32f2f" }}>{info}</div>}
       </form>
     </Modal>
   );
 }
+
 function Modal({ title, children, onClose }) {
   return (
     <div style={{
-      position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", zIndex: 160, background: "rgba(32,50,74,0.18)", display: "flex", alignItems: "center", justifyContent: "center"
+      position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", zIndex: 160,
+      background: "rgba(32,50,74,0.18)", display: "flex", alignItems: "center", justifyContent: "center"
     }}>
       <div style={{
         background: "#fff", borderRadius: 18, width: 370, maxWidth: "97vw", maxHeight: "88vh", overflowY: "auto",
@@ -613,6 +689,7 @@ function Modal({ title, children, onClose }) {
     </div>
   );
 }
+
 function StatCard({ icon, label, value, theme }) {
   return (
     <div style={{
@@ -622,7 +699,8 @@ function StatCard({ icon, label, value, theme }) {
       minWidth: 150,
       boxShadow: "0 2px 8px #1786ed13",
       padding: "18px 13px",
-      color: theme === "dark" ? "#e9faff" : secondaryColor
+      color: theme === "dark" ? "#e9faff" : secondaryColor,
+      userSelect: "none"
     }}>
       <span style={{
         background: theme === "dark" ? "#24436c" : "#d7f1ff",
@@ -638,6 +716,7 @@ function StatCard({ icon, label, value, theme }) {
     </div>
   );
 }
+
 function DropdownItem({ theme, icon, label, onClick, color }) {
   return (
     <div
@@ -665,7 +744,6 @@ function DropdownItem({ theme, icon, label, onClick, color }) {
   );
 }
 
-// shared styles
 const tabBtn = (active, theme) => ({
   flex: 1,
   background: active ? accentColor : "transparent",
