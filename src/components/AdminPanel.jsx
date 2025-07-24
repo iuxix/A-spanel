@@ -1,126 +1,202 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
-import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from "firebase/firestore";
+import {
+  collection, query, where, onSnapshot, doc, updateDoc, getDoc, deleteDoc
+} from "firebase/firestore";
 
 const primaryColor = "#1b365d";
 const secondaryColor = "#2474df";
 const accentColor = "#36c2ff";
 
 export default function AdminPanel() {
-  const [deposits, setDeposits] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [userHistory, setUserHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [actionMsg, setActionMsg] = useState("");
 
+  // Listen payments requests (fund adds)
   useEffect(() => {
-    const q = query(collection(db, "deposits"), where("status", "==", "pending"));
-    const unsub = onSnapshot(q, snapshot => {
-      setDeposits(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    const q = query(collection(db, "payments"), where("status", "==", "pending"));
+    const unsub = onSnapshot(q, snap => {
+      setPayments(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
     return () => unsub();
   }, []);
 
-  async function approveDeposit(dep) {
-    setActionMsg(""); setLoading(true);
+  // Listen admin/user history (all actions)
+  useEffect(() => {
+    const q = query(collection(db, "history"), 
+      // Optionally, order desc or filter; here fetch all for admin
+    );
+    const unsub = onSnapshot(q, snap => {
+      setUserHistory(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.timestamp - a.timestamp));
+    });
+    return () => unsub();
+  }, []);
+
+  // Accept payment: update user balance, delete payment doc, log action to history
+  async function acceptPayment(payment) {
+    setActionMsg("");
+    setLoading(true);
     try {
-      await updateDoc(doc(db, "deposits", dep.id), { status: "accepted" });
-      const userRef = doc(db, "users", dep.user);
+      const userRef = doc(db, "users", payment.user);
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
         const currentBalance = userSnap.data().balance || 0;
-        await updateDoc(userRef, { balance: currentBalance + dep.amount });
+        await updateDoc(userRef, { balance: currentBalance + payment.amount });
       }
-      setActionMsg(`✅ Accepted deposit of ₹${dep.amount} by ${dep.username || dep.user}`);
-    } catch (e) {
-      setActionMsg("❌ Error approving deposit: "+e.message);
+      await deleteDoc(doc(db, "payments", payment.id));
+      await addDoc(collection(db, "history"), {
+        type: "payment_accept",
+        user: payment.user,
+        description: `Accepted fund ₹${payment.amount} from ${payment.username || payment.user}`,
+        timestamp: Date.now()
+      });
+      setActionMsg(`✅ Accepted ₹${payment.amount} from ${payment.username || payment.user}`);
+    } catch (err) {
+      setActionMsg("❌ Error accepting payment: " + err.message);
     }
     setLoading(false);
   }
 
-  async function rejectDeposit(dep) {
-    setActionMsg(""); setLoading(true);
+  // Reject payment: delete payment doc, log action
+  async function rejectPayment(payment) {
+    setActionMsg("");
+    setLoading(true);
     try {
-      await updateDoc(doc(db, "deposits", dep.id), { status: "rejected" });
-      setActionMsg(`❌ Rejected deposit of ₹${dep.amount} by ${dep.username || dep.user}`);
-    } catch (e) {
-      setActionMsg("❌ Error rejecting deposit: "+e.message);
+      await deleteDoc(doc(db, "payments", payment.id));
+      await addDoc(collection(db, "history"), {
+        type: "payment_reject",
+        user: payment.user,
+        description: `Rejected fund ₹${payment.amount} from ${payment.username || payment.user}`,
+        timestamp: Date.now()
+      });
+      setActionMsg(`❌ Rejected ₹${payment.amount} from ${payment.username || payment.user}`);
+    } catch (err) {
+      setActionMsg("❌ Error rejecting payment: " + err.message);
     }
     setLoading(false);
   }
 
   return (
-    <div style={{ maxWidth: 800, margin: "auto", padding: 32, fontFamily: "Poppins,sans-serif", color: primaryColor }}>
-      <h2 style={{ fontWeight: 900, fontSize: "1.55em", marginBottom: 24, borderBottom: `3px solid ${primaryColor}`, paddingBottom: 7 }}>
-        Admin Panel – Pending Deposits
-      </h2>
+    <div style={{ maxWidth: 800, margin: "auto", padding: 30, fontFamily: "Poppins, sans-serif", color: primaryColor }}>
+      <h1 style={{ fontWeight: 900, fontSize: "1.8em", marginBottom: 24, borderBottom: `3px solid ${primaryColor}`, paddingBottom: 6 }}>
+        Admin Panel — Fund Requests & History
+      </h1>
+
       {actionMsg && (
         <div style={{
-          marginBottom: 22,
+          padding: 14,
+          marginBottom: 20,
+          borderRadius: 9,
           fontWeight: 700,
           color: actionMsg.startsWith("✅") ? "#2e7d32" : "#d32f2f",
-          background: actionMsg.startsWith("✅") ? "#dbf8e3" : "#ffe6ed",
-          padding: 12,
-          borderRadius: 9
+          backgroundColor: actionMsg.startsWith("✅") ? "#dbf8e3" : "#ffe6ea",
+          userSelect: "none"
         }}>
           {actionMsg}
         </div>
       )}
-      {deposits.length === 0 ? (
-        <div style={{ fontSize: "1.08em", color: "#789" }}>No pending requests.</div>
-      ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ backgroundColor: secondaryColor, color: "#fff" }}>
-              <th style={thStyle}>User</th>
-              <th style={thStyle}>Amount (₹)</th>
-              <th style={thStyle}>Request Date</th>
-              <th style={thStyle}>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {deposits.map(dep => (
-              <tr key={dep.id} style={{ borderBottom: "1px solid #ddd" }}>
-                <td style={tdStyle}>{dep.username || dep.user}</td>
-                <td style={tdStyle}>{dep.amount.toFixed(2)}</td>
-                <td style={tdStyle}>{dep.created?.toDate ? dep.created.toDate().toLocaleString() : new Date(dep.created).toLocaleString()}</td>
-                <td style={tdStyle}>
-                  <button onClick={() => approveDeposit(dep)} disabled={loading} style={btnApprove}>Accept</button>
-                  <button onClick={() => rejectDeposit(dep)} disabled={loading} style={btnReject}>Reject</button>
-                </td>
+
+      <section style={{ marginBottom: 40 }}>
+        <h2 style={{ fontWeight: 800, fontSize: "1.35em", marginBottom: 14, borderBottom: `2px solid ${accentColor}`, paddingBottom: 4 }}>
+          Pending Fund Requests
+        </h2>
+        {payments.length === 0 ? (
+          <p style={{ color: "#666", fontStyle: "italic" }}>No pending fund requests.</p>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead style={{ backgroundColor: secondaryColor, color: "#fff" }}>
+              <tr>
+                <th style={thStyle}>User</th>
+                <th style={thStyle}>Amount (₹)</th>
+                <th style={thStyle}>Requested At</th>
+                <th style={thStyle}>Action</th>
               </tr>
+            </thead>
+            <tbody>
+              {payments.map(p => (
+                <tr key={p.id} style={{ borderBottom: "1px solid #ddd" }}>
+                  <td style={tdStyle}>{p.username || p.user}</td>
+                  <td style={tdStyle}>{p.amount.toFixed(2)}</td>
+                  <td style={tdStyle}>{p.created?.toDate ? p.created.toDate().toLocaleString() : new Date(p.created).toLocaleString()}</td>
+                  <td style={tdStyle}>
+                    <button onClick={() => acceptPayment(p)} disabled={loading} style={btnAccept}>
+                      Accept
+                    </button>
+                    <button onClick={() => rejectPayment(p)} disabled={loading} style={btnReject}>
+                      Reject
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      <section>
+        <h2 style={{ fontWeight: 800, fontSize: "1.35em", marginBottom: 14, borderBottom: `2px solid ${accentColor}`, paddingBottom: 4 }}>
+          Action History
+        </h2>
+        {userHistory.length === 0 ? (
+          <p style={{ color: "#666", fontStyle: "italic" }}>No action history available.</p>
+        ) : (
+          <div style={{ maxHeight: "55vh", overflowY: "auto" }}>
+            {userHistory.map(h => (
+              <div key={h.id} style={historyItemStyle}>
+                <div><b>{h.type.replace(/_/g, " ").toUpperCase()}</b> - {h.description}</div>
+                <div style={{ fontSize: "0.83em", color: "#555" }}>{new Date(h.timestamp).toLocaleString()}</div>
+              </div>
             ))}
-          </tbody>
-        </table>
-      )}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
+
 const thStyle = {
-  padding: "11px 8px",
+  padding: "9px 10px",
   fontWeight: "700",
+  fontSize: "1em",
   textAlign: "left",
-  fontSize: "0.97em"
+  userSelect: "none"
 };
 const tdStyle = {
-  padding: "11px 8px",
-  fontSize: "0.97em",
+  padding: "8px 10px",
+  fontSize: "0.95em",
   verticalAlign: "middle"
 };
-const btnApprove = {
-  background: "#33c480",
+
+const btnAccept = {
+  background: "#36c239",
   border: "none",
   color: "#fff",
-  fontWeight: 800,
-  padding: "6px 16px",
-  borderRadius: 7,
-  marginRight: 7,
-  cursor: "pointer"
+  padding: "7px 13px",
+  borderRadius: 8,
+  marginRight: 8,
+  fontWeight: "700",
+  cursor: "pointer",
+  userSelect: "none"
 };
+
 const btnReject = {
-  background: "#e53857",
+  background: "#e53d4f",
   border: "none",
   color: "#fff",
-  fontWeight: 800,
-  padding: "6px 16px",
-  borderRadius: 7,
-  cursor: "pointer"
+  padding: "7px 13px",
+  borderRadius: 8,
+  fontWeight: "700",
+  cursor: "pointer",
+  userSelect: "none"
+};
+
+const historyItemStyle = {
+  backgroundColor: "#f4f7fe",
+  borderRadius: 10,
+  padding: "12px 15px",
+  marginBottom: 10,
+  fontSize: "0.95em",
+  color: primaryColor
 };
