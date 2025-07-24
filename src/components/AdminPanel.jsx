@@ -3,8 +3,8 @@ import { db } from "../firebase";
 import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from "firebase/firestore";
 
 const primaryColor = "#1b365d";
-const secondaryColor = "#2b539f";
-const accentColor = "#54c7ec";
+const secondaryColor = "#2474df";
+const accentColor = "#36c2ff";
 
 export default function AdminPanel() {
   const [deposits, setDeposits] = useState([]);
@@ -20,95 +20,71 @@ export default function AdminPanel() {
   }, []);
 
   async function approveDeposit(dep) {
-    setActionMsg("");
-    setLoading(true);
+    setActionMsg(""); setLoading(true);
     try {
-      const depRef = doc(db, "deposits", dep.id);
-      await updateDoc(depRef, { status: "accepted" });
-
+      await updateDoc(doc(db, "deposits", dep.id), { status: "accepted" });
       const userRef = doc(db, "users", dep.user);
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
         const currentBalance = userSnap.data().balance || 0;
         await updateDoc(userRef, { balance: currentBalance + dep.amount });
       }
-      setActionMsg(`✅ Accepted deposit of ₹${dep.amount} by user: ${dep.username || dep.user}`);
-    } catch (error) {
-      setActionMsg(`❌ Error approving deposit: ${error.message}`);
+      setActionMsg(`✅ Accepted deposit of ₹${dep.amount} by ${dep.username || dep.user}`);
+    } catch (e) {
+      setActionMsg("❌ Error approving deposit: "+e.message);
     }
     setLoading(false);
   }
 
   async function rejectDeposit(dep) {
-    setActionMsg("");
-    setLoading(true);
+    setActionMsg(""); setLoading(true);
     try {
-      const depRef = doc(db, "deposits", dep.id);
-      await updateDoc(depRef, { status: "rejected" });
-      setActionMsg(`❌ Rejected deposit of ₹${dep.amount} by user: ${dep.username || dep.user}`);
-    } catch (error) {
-      setActionMsg(`❌ Error rejecting deposit: ${error.message}`);
+      await updateDoc(doc(db, "deposits", dep.id), { status: "rejected" });
+      setActionMsg(`❌ Rejected deposit of ₹${dep.amount} by ${dep.username || dep.user}`);
+    } catch (e) {
+      setActionMsg("❌ Error rejecting deposit: "+e.message);
     }
     setLoading(false);
   }
 
   return (
-    <div style={{ maxWidth: 780, margin: "auto", padding: 32, fontFamily: "Poppins, sans-serif", color: primaryColor }}>
-      <h2 style={{ fontWeight: 900, fontSize: "1.7em", marginBottom: 24, borderBottom: `3px solid ${primaryColor}` }}>
-        Admin Panel - Deposit Requests
+    <div style={{ maxWidth: 800, margin: "auto", padding: 32, fontFamily: "Poppins,sans-serif", color: primaryColor }}>
+      <h2 style={{ fontWeight: 900, fontSize: "1.55em", marginBottom: 24, borderBottom: `3px solid ${primaryColor}`, paddingBottom: 7 }}>
+        Admin Panel – Pending Deposits
       </h2>
-
       {actionMsg && (
         <div style={{
-          marginBottom: 24,
+          marginBottom: 22,
           fontWeight: 700,
           color: actionMsg.startsWith("✅") ? "#2e7d32" : "#d32f2f",
-          backgroundColor: actionMsg.startsWith("✅") ? "#d0f0c0" : "#ffd7d7",
-          padding: 14,
-          borderRadius: 10,
-          userSelect: "none"
+          background: actionMsg.startsWith("✅") ? "#dbf8e3" : "#ffe6ed",
+          padding: 12,
+          borderRadius: 9
         }}>
           {actionMsg}
         </div>
       )}
-
       {deposits.length === 0 ? (
-        <p style={{ fontSize: "1.2em", color: "#555" }}>No pending deposit requests.</p>
+        <div style={{ fontSize: "1.08em", color: "#789" }}>No pending requests.</div>
       ) : (
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead style={{ backgroundColor: secondaryColor, color: "#fff" }}>
-            <tr>
-              <th style={headerCellStyle}>User</th>
-              <th style={headerCellStyle}>Amount (₹)</th>
-              <th style={headerCellStyle}>Request Date</th>
-              <th style={headerCellStyle}>Actions</th>
+          <thead>
+            <tr style={{ backgroundColor: secondaryColor, color: "#fff" }}>
+              <th style={thStyle}>User</th>
+              <th style={thStyle}>Amount (₹)</th>
+              <th style={thStyle}>Request Date</th>
+              <th style={thStyle}>Action</th>
             </tr>
           </thead>
           <tbody>
             {deposits.map(dep => (
-              <tr key={dep.id} style={{ borderBottom: "1px solid #cfd8dc" }}>
-                <td style={cellStyle}>{dep.username || dep.user}</td>
-                <td style={cellStyle}>{dep.amount.toFixed(2)}</td>
-                <td style={cellStyle}>{dep.created?.toDate ? dep.created.toDate().toLocaleString() : new Date(dep.created).toLocaleString()}</td>
-                <td style={cellStyle}>
-                  <button
-                    onClick={() => approveDeposit(dep)}
-                    disabled={loading}
-                    style={approveBtnStyle}
-                    aria-label={`Accept deposit from ${dep.username || dep.user}`}
-                    type="button"
-                  >
-                    Accept
-                  </button>
-                  <button
-                    onClick={() => rejectDeposit(dep)}
-                    disabled={loading}
-                    style={rejectBtnStyle}
-                    aria-label={`Reject deposit from ${dep.username || dep.user}`}
-                    type="button"
-                  >
-                    Reject
-                  </button>
+              <tr key={dep.id} style={{ borderBottom: "1px solid #ddd" }}>
+                <td style={tdStyle}>{dep.username || dep.user}</td>
+                <td style={tdStyle}>{dep.amount.toFixed(2)}</td>
+                <td style={tdStyle}>{dep.created?.toDate ? dep.created.toDate().toLocaleString() : new Date(dep.created).toLocaleString()}</td>
+                <td style={tdStyle}>
+                  <button onClick={() => approveDeposit(dep)} disabled={loading} style={btnApprove}>Accept</button>
+                  <button onClick={() => rejectDeposit(dep)} disabled={loading} style={btnReject}>Reject</button>
                 </td>
               </tr>
             ))}
@@ -118,42 +94,33 @@ export default function AdminPanel() {
     </div>
   );
 }
-
-const headerCellStyle = {
-  padding: "12px 14px",
+const thStyle = {
+  padding: "11px 8px",
   fontWeight: "700",
-  fontSize: "1em",
   textAlign: "left",
-  userSelect: "none"
+  fontSize: "0.97em"
 };
-
-const cellStyle = {
-  padding: "12px 14px",
-  fontSize: "0.95em",
-  color: primaryColor,
-  userSelect: "text",
+const tdStyle = {
+  padding: "11px 8px",
+  fontSize: "0.97em",
   verticalAlign: "middle"
 };
-
-const approveBtnStyle = {
-  backgroundColor: "#388e3c",
+const btnApprove = {
+  background: "#33c480",
   border: "none",
   color: "#fff",
-  fontWeight: 700,
-  padding: "8px 16px",
-  borderRadius: 8,
-  marginRight: 12,
-  cursor: "pointer",
-  userSelect: "none"
+  fontWeight: 800,
+  padding: "6px 16px",
+  borderRadius: 7,
+  marginRight: 7,
+  cursor: "pointer"
 };
-
-const rejectBtnStyle = {
-  backgroundColor: "#d32f2f",
+const btnReject = {
+  background: "#e53857",
   border: "none",
   color: "#fff",
-  fontWeight: 700,
-  padding: "8px 16px",
-  borderRadius: 8,
-  cursor: "pointer",
-  userSelect: "none"
+  fontWeight: 800,
+  padding: "6px 16px",
+  borderRadius: 7,
+  cursor: "pointer"
 };
