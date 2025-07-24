@@ -11,22 +11,162 @@ import {
 import AddFundsModal from "./components/AddFundsModal"; // <-- IMPORTING THE NEW COMPONENT
 
 const categories = [
-  { value: "new-ig", label: "⭐ New IG Services 😎⭐" },
-  { value: "ig-followers-new", label: "IG Followers New" },
-  { value: "telegram", label: "Telegram" }
+const categories = [
+    { value: "special-offers", label: "⭐ Special Offers & Deals" },
+    { value: "ig-followers-guaranteed", label: "💎 Instagram Followers [Guaranteed]" },
+    { value: "ig-followers-cheap", label: "➡ Instagram Followers [No-Guarantee]" },
+    { value: "ig-likes", label: "❤️ Instagram Likes" },
+    { value: "ig-views-reels", label: "👁️‍🗨️ Instagram Views / Reels" },
+    { value: "ig-engagement", label: "💬 Instagram Comments / Engagement" },
+    { value: "threads-services", label: "✍️ Threads Services (New!)" },
+    { value: "telegram-members", label: "✈️ Telegram Members" },
+    { value: "telegram-engagement", label: "✈️ Telegram Views & Reactions" },
+    { value: "youtube-views", label: "🔴 YouTube Views" },
+    { value: "youtube-engagement", label: "📈 YouTube Likes, Subs & Comments" },
+    { value: "facebook-services", label: "👍 Facebook Page & Post Services" },
+    { value: "tiktok-services", label: "🎵 TikTok Services" },
+    { value: "twitter-x-services", label: "✖️ Twitter (X) Services" },
+    { value: "other-platforms", label: "🌐 Other Platforms (Spotify, Discord, etc.)" },
 ];
+
 const services = {
-  "new-ig": [
-    { id: "1572", title: "Instagram Reels Views [NoN~Drop | 10M/Day]", badge: "1572", badgeColor: "#0cb2ed", desc: "Start: Instant\nSpeed: 10M/Day", avgtime: "3 hours", min: 100, max: 1000000, price: 0.13 }
-  ],
-  "ig-followers-new": [
-    { id: "10571", title: "Instagram Followers Old Accounts | 365 Days Refill", badge: "10571", badgeColor: "#619bf1", desc: "Quality: Old Accounts\nRefill: 365 Days", avgtime: "5 hours", min: 100, max: 1000000, price: 121.5 },
-    { id: "10572", title: "Instagram Followers Old Accounts | Lifetime Refill", badge: "10572", badgeColor: "#619bf1", desc: "Quality: Old Accounts\nRefill: Lifetime", avgtime: "7 hours", min: 100, max: 1000000, price: 121.5 }
-  ],
-  "telegram": [
-    { id: "3011", title: "Telegram Post Views Auto", badge: "TG", badgeColor: "#15b6f1", desc: "Instant, non drop", avgtime: "1 hour", min: 100, max: 4000000, price: 0.02 }
-  ]
+    "special-offers": [
+        { id: "9999", title: "Instagram Followers [🔥 High Quality | 100k/Day] (Price: ₹66.0/1k)", badge: "SALE", badgeColor: "#f44336", desc: "Speed: 100k/Day\nDrop: 1-5%\nRefill: 30 Days", avgtime: "1 hour", min: 500, max: 5000000, price: 66.0 },
+        { id: "8888", title: "Instagram Likes [⚡ Instant Delivery | Real] (Price: ₹14.4/1k)", badge: "⚡FAST", badgeColor: "#ffc107", desc: "Quality: Real Likes\nSpeed: Super Fast\nStart: Instant", avgtime: "5 minutes", min: 100, max: 100000, price: 14.4 },
+        { id: "7777", title: "YouTube Views [High Retention | Monetizable] (Price: ₹176.0/1k)", badge: "YT DEAL", badgeColor: "#e53935", desc: "Retention: 60-80%\nSpeed: 10k/Day\nMonetizable", avgtime: "6 hours", min: 1000, max: 1000000, price: 176.0 },
+        { id: "6666", title: "Telegram Members [✈️ Non Drop | Real Looking] (Price: ₹112.0/1k)", badge: "TELEGRAM DEAL", badgeColor: "#1e88e5", desc: "Quality: Real-looking profiles\nSpeed: 20k/Day", avgtime: "1 hour", min: 500, max: 100000, price: 112.0 },
+        { id: "5555", title: "TikTok Views [Super Fast | Viral Boost] (Price: ₹1.20/1k)", badge: "TIKTOK DEAL", badgeColor: "#25F4EE", desc: "Speed: 1M/Day\nStart: Instant\nHelps to go viral!", avgtime: "5 minutes", min: 1000, max: 10000000, price: 1.20 },
+        { id: "4444", title: "Instagram Story Views (Price: ₹0.64/1k)", badge: "STORY DEAL", badgeColor: "#00bcd4", desc: "Service: Story Views\nNote: Link must be to your profile", avgtime: "30 minutes", min: 100, max: 50000, price: 0.64 },
+        { id: "3333", title: "Instagram Reel Views [Cheapest & Superfast] (Price: ₹0.06/1k)", badge: "REEL DEAL", badgeColor: "#03a9f4", desc: "Speed: 500k/Day\nWorks on all links", avgtime: "10 minutes", min: 100, max: 10000000, price: 0.06 }
+    ],
+    "ig-followers-guaranteed": [
+        { id: "10571", title: "Instagram Followers [Old Accounts | 365 Days Refill] (Price: ₹72.9/1k)", badge: "STABLE", badgeColor: "#4caf50", desc: "Quality: Old Accounts With Posts\nRefill: 365 Days Guarantee ♻️", avgtime: "3 hours", min: 100, max: 1000000, price: 72.9 },
+        { id: "11569", title: "Instagram Followers [Old Accounts w/ 15 Posts | Stable] (Price: ₹66.07/1k)", badge: "HQ", badgeColor: "#673ab7", desc: "Quality: 100% Old Accounts With 15 Posts\nRefill: 365 Days Guarantee ♻️\nSpeed: 40k/Day", avgtime: "2 hours", min: 100, max: 2000000, price: 66.07 },
+        { id: "11571", title: "Instagram Followers [Good Service | 365 Days Refill] (Price: ₹50.45/1k)", badge: "RELIABLE", badgeColor: "#00bcd4", desc: "Quality: 100% Old Accounts With 8 Posts\nDrop: 0-5% | 50k/Day", avgtime: "4 hours", min: 500, max: 50000, price: 50.45 },
+        { id: "1001", title: "Instagram Followers [👑 Premium Quality | Lifetime Refill] (Price: ₹89.4/1k)", badge: "PREMIUM", badgeColor: "#e91e63", desc: "Quality: Top Tier Accounts\nRefill: Lifetime Guarantee ♻️", avgtime: "2 hours", min: 100, max: 1000000, price: 89.4 },
+        { id: "1003", title: "Instagram Followers [🇮🇳 Indian Accounts | 30 Days Refill] (Price: ₹108.0/1k)", badge: "INDIAN", badgeColor: "#ff9800", desc: "Quality: Indian Profiles\nRefill: 30 Days Guarantee", avgtime: "4 hours", min: 500, max: 50000, price: 108.0 },
+        { id: "1004", title: "Instagram Followers [👩 Female | Real Looking] (Price: ₹120.0/1k)", badge: "FEMALE", badgeColor: "#E91E63", desc: "Quality: Female-looking profiles\nRefill: 30 Days", avgtime: "6 hours", min: 100, max: 20000, price: 120.0 },
+        { id: "1005", title: "Instagram Followers [Organic Drip Feed | Slow] (Price: ₹76.8/1k)", badge: "DRIP", badgeColor: "#3F51B5", desc: "Speed: 100-500/Day (Organic Look)\nRefill: 60 Days", avgtime: "1-2 days", min: 100, max: 10000, price: 76.8 }
+    ],
+    "ig-followers-cheap": [
+        { id: "11570", title: "Instagram Followers [Indian Organic | No-Refill] (Price: ₹51.0/1k)", badge: "NO-REFILL", badgeColor: "#9e9e9e", desc: "Quality: Indian Organic Accounts With Story & Bio\nDrop: Can be high\nRefill: No Guarantee ❌", avgtime: "30 minutes", min: 1000, max: 10000000, price: 51.0 },
+        { id: "11582", title: "Instagram Followers [ULTRA FAST | No-Refill] (Price: ₹43.89/1k)", badge: "⚡FAST", badgeColor: "#ff5722", desc: "Quality: Mixed/Bot Accounts\nSpeed: 300k/500k Day\nRefill: No Guarantee ❌", avgtime: "15 minutes", min: 1000, max: 20000000, price: 43.89 },
+        { id: "2001", title: "Instagram Followers [Cheapest Bot Service] (Price: ₹21.0/1k)", badge: "BOT", badgeColor: "#607d8b", desc: "Quality: Bot Accounts\nRefill: No Guarantee ❌\nFor numbers only", avgtime: "10 minutes", min: 1000, max: 50000000, price: 21.0 },
+        { id: "2002", title: "Instagram Followers [Mixed Quality | 1M/Day] (Price: ₹33.6/1k)", badge: "MIXED", badgeColor: "#795548", desc: "Quality: Mixed Bot/Real-looking\nSpeed: 1M/Day\nRefill: No Guarantee ❌", avgtime: "20 minutes", min: 500, max: 10000000, price: 33.6 },
+        { id: "2003", title: "Instagram Followers [Arabic Profiles | No-Refill] (Price: ₹54.0/1k)", badge: "ARABIC", badgeColor: "#009688", desc: "Quality: Arabic-looking profiles\nRefill: No Guarantee ❌", avgtime: "1 hour", min: 100, max: 50000, price: 54.0 },
+        { id: "2004", title: "Instagram Followers [Turkish Profiles | No-Refill] (Price: ₹54.0/1k)", badge: "TURKISH", badgeColor: "#009688", desc: "Quality: Turkish-looking profiles\nRefill: No Guarantee ❌", avgtime: "1 hour", min: 100, max: 50000, price: 54.0 },
+        { id: "2005", title: "Instagram Followers [Brazilian Profiles | No-Refill] (Price: ₹57.0/1k)", badge: "BRAZIL", badgeColor: "#4caf50", desc: "Quality: Brazilian-looking profiles\nRefill: No Guarantee ❌", avgtime: "1 hour", min: 100, max: 50000, price: 57.0 }
+    ],
+    "ig-likes": [
+        { id: "701", title: "Instagram Power Likes [⚡ 10K/Hour | Super Active] (Price: ₹53.6/1k)", badge: "POWER", badgeColor: "#e91e63", desc: "Quality: Likes from 5k-100k follower accounts\nStart: 0-10 Mins\nRefill: 30 Days", avgtime: "6 minutes", min: 20, max: 70000, price: 53.6 },
+        { id: "1152", title: "Instagram Likes [❤️ Real Likes | Auto-Refill] (Price: ₹14.42/1k)", badge: "REAL", badgeColor: "#f44336", desc: "Quality: Real users + Reach + Impressions\nRefill: 30 Days Auto-Refill\nSpeed: 5K/Hour", avgtime: "10 minutes", min: 10, max: 300000, price: 14.42 },
+        { id: "3002", title: "Instagram Likes [⚡ Super Fast | Mixed Quality] (Price: ₹9.6/1k)", badge: "FAST", badgeColor: "#ff9800", desc: "Quality: Mixed\nSpeed: Instant Start", avgtime: "5 minutes", min: 100, max: 200000, price: 9.6 },
+        { id: "3003", title: "Instagram Likes [🇮🇳 Indian Likes] (Price: ₹22.4/1k)", badge: "INDIAN", badgeColor: "#4caf50", desc: "Quality: Indian users\nStart: 0-15 Mins", avgtime: "15 minutes", min: 50, max: 50000, price: 22.4 },
+        { id: "3004", title: "Instagram Likes [Saves Included] (Price: ₹17.6/1k)", badge: "LIKES+SAVES", badgeColor: "#2196f3", desc: "Likes and Saves together to boost your post.", avgtime: "10 minutes", min: 100, max: 100000, price: 17.6 },
+        { id: "3005", title: "Instagram Likes [Drip Feed | Slow & Steady] (Price: ₹22.4/1k)", badge: "DRIP", badgeColor: "#3f51b5", desc: "Deliver likes slowly over time for an organic look.", avgtime: "1 hour", min: 100, max: 20000, price: 22.4 },
+        { id: "3006", title: "Instagram Reel Likes (Price: ₹12.0/1k)", badge: "REEL LIKES", badgeColor: "#00acc1", desc: "Likes specifically for your Instagram Reels.", avgtime: "10 minutes", min: 100, max: 100000, price: 12.0 }
+    ],
+    "ig-views-reels": [
+        { id: "11572", title: "Instagram Reel Views [Emergency Working Update] (Price: ₹0.08/1k)", badge: "REELS", badgeColor: "#2196f3", desc: "Service: Reel Views\nStart: Instant\nSpeed: 10M/Day", avgtime: "15 minutes", min: 100, max: 10000000, price: 0.08 },
+        { id: "11566", title: "Instagram Reel Views [Cheapest & Superfast] (Price: ₹0.06/1k)", badge: "⚡FAST", badgeColor: "#03a9f4", desc: "Speed: 500k/Day\nWorks on all links", avgtime: "10 minutes", min: 100, max: 10000000, price: 0.06 },
+        { id: "4002", title: "Instagram Story Views (Price: ₹0.64/1k)", badge: "STORY", badgeColor: "#00bcd4", desc: "Service: Story Views\nNote: Link must be to your profile", avgtime: "30 minutes", min: 100, max: 50000, price: 0.64 },
+        { id: "4003", title: "Instagram IGTV Views (Price: ₹0.80/1k)", badge: "IGTV", badgeColor: "#00acc1", desc: "Service: IGTV Video Views\nStart: Instant", avgtime: "20 minutes", min: 100, max: 10000000, price: 0.80 },
+        { id: "4004", title: "Instagram Live Video Views [30 Mins] (Price: ₹96.0/1k)", badge: "LIVE", badgeColor: "#f44336", desc: "Concurrent viewers for your live stream for 30 minutes.", avgtime: "0-5 minutes", min: 100, max: 10000, price: 96.0 },
+        { id: "4005", title: "Instagram Reel Views + Impressions (Price: ₹0.96/1k)", badge: "VIEWS+", badgeColor: "#009688", desc: "Views with added Reach and Impressions stats.", avgtime: "20 minutes", min: 100, max: 5000000, price: 0.96 },
+        { id: "4006", title: "Instagram Profile Visits (Price: ₹1.6/1k)", badge: "VISITS", badgeColor: "#795548", desc: "Sends visits to your profile page.", avgtime: "30 minutes", min: 100, max: 100000, price: 1.6 }
+    ],
+    "ig-engagement": [
+        { id: "7001", title: "Instagram Comments [💬 Custom | You provide] (Price: ₹192.0/1k)", badge: "CUSTOM", badgeColor: "#8e44ad", desc: "You provide the list of comments.\nQuality: Real-looking profiles.", avgtime: "1 hour", min: 10, max: 10000, price: 192.0 },
+        { id: "7002", title: "Instagram Comments [✅ English | Random Positive] (Price: ₹128.0/1k)", badge: "RANDOM", badgeColor: "#9b59b6", desc: "Comments will be random and positive, related to your post.", avgtime: "1 hour", min: 10, max: 10000, price: 128.0 },
+        { id: "7003", title: "Instagram Saves [Must-have for Algorithm] (Price: ₹32.0/1k)", badge: "SAVES", badgeColor: "#2ecc71", desc: "Boosts your post in the algorithm.\nStart: Instant", avgtime: "20 minutes", min: 100, max: 500000, price: 32.0 },
+        { id: "7004", title: "Instagram Mentions [User Followers] (Price: ₹96.0/1k)", badge: "MENTIONS", badgeColor: "#3498db", desc: "Mention users who follow a specific account (e.g., your competitor).", avgtime: "2-4 hours", min: 1000, max: 1000000, price: 96.0 },
+        { id: "7005", title: "Instagram Poll Votes (Price: ₹64.0/1k)", badge: "POLL", badgeColor: "#e67e22", desc: "Get votes on your story polls.", avgtime: "30 minutes", min: 100, max: 100000, price: 64.0 },
+        { id: "7006", title: "Instagram Auto-Likes [30 Days Subscription] (Price: ₹1600.0/sub)", badge: "AUTO", badgeColor: "#c0392b", desc: "Automatically get likes on your future posts for 30 days.", avgtime: "Subscription", min: 1, max: 1, price: 1600.0 },
+        { id: "7007", title: "Instagram DMs [Send to Target Audience] (Price: ₹320.0/1k)", badge: "DMs", badgeColor: "#1abc9c", desc: "Send a custom message to followers of a target account.", avgtime: "24 hours", min: 1000, max: 10000, price: 320.0 }
+    ],
+    "threads-services": [
+        { id: "12001", title: "Threads Followers (Price: ₹128.0/1k)", badge: "FOLLOWERS", badgeColor: "#141414", desc: "Get followers on your new Threads profile.", avgtime: "2 hours", min: 100, max: 50000, price: 128.0 },
+        { id: "12002", title: "Threads Likes (Price: ₹64.0/1k)", badge: "LIKES", badgeColor: "#333333", desc: "Likes for your Threads posts.", avgtime: "30 minutes", min: 100, max: 20000, price: 64.0 },
+        { id: "12003", title: "Threads Reposts (Price: ₹96.0/1k)", badge: "REPOSTS", badgeColor: "#555555", desc: "Get your threads reposted by other users.", avgtime: "1 hour", min: 100, max: 10000, price: 96.0 },
+        { id: "12004", title: "Threads Comments [Random Positive] (Price: ₹160.0/1k)", badge: "COMMENTS", badgeColor: "#777777", desc: "Random positive comments on your threads.", avgtime: "2 hours", min: 20, max: 1000, price: 160.0 },
+        { id: "12005", title: "Threads Profile Clicks (Price: ₹32.0/1k)", badge: "CLICKS", badgeColor: "#999999", desc: "Drives traffic to your Threads profile.", avgtime: "1 hour", min: 100, max: 50000, price: 32.0 },
+        { id: "12006", title: "Threads Views (Price: ₹1.6/1k)", badge: "VIEWS", badgeColor: "#1e1e1e", desc: "Views for your Threads videos.", avgtime: "15 minutes", min: 1000, max: 1000000, price: 1.6 },
+        { id: "12007", title: "Threads All-in-One [Follows, Likes, Reposts] (Price: ₹256.0/1k)", badge: "PACK", badgeColor: "#000000", desc: "A package of followers, likes, and reposts.", avgtime: "3 hours", min: 100, max: 10000, price: 256.0 }
+    ],
+    "telegram-members": [
+        { id: "8001", title: "Telegram Channel Members [✈️ Non Drop | Real Looking] (Price: ₹120.0/1k)", badge: "NON-DROP", badgeColor: "#3498db", desc: "Quality: Real-looking profiles\nSpeed: 20k/Day", avgtime: "1 hour", min: 500, max: 100000, price: 120.0 },
+        { id: "8004", title: "Telegram Channel Members [🇮🇳 Indian] (Price: ₹160.0/1k)", badge: "INDIAN", badgeColor: "#f1c40f", desc: "Adds Indian members to your channel.", avgtime: "3 hours", min: 200, max: 20000, price: 160.0 },
+        { id: "8101", title: "Telegram Group Members [Fast & Cheap] (Price: ₹96.0/1k)", badge: "GROUP", badgeColor: "#2ecc71", desc: "Members specifically for groups (not channels).", avgtime: "1 hour", min: 500, max: 100000, price: 96.0 },
+        { id: "8102", title: "Telegram Members [Crypto/NFT Audience] (Price: ₹240.0/1k)", badge: "CRYPTO", badgeColor: "#e67e22", desc: "Adds members interested in Crypto and NFTs.", avgtime: "6 hours", min: 500, max: 25000, price: 240.0 },
+        { id: "8103", title: "Telegram Members [👩 Female Profiles] (Price: ₹200.0/1k)", badge: "FEMALE", badgeColor: "#e91e63", desc: "Adds female-looking profiles to your channel/group.", avgtime: "4 hours", min: 200, max: 10000, price: 200.0 },
+        { id: "8104", title: "Telegram Members [Slow Drip Feed] (Price: ₹144.0/1k)", badge: "DRIP", badgeColor: "#9b59b6", desc: "Adds members slowly over several days for an organic look.", avgtime: "1-3 days", min: 100, max: 10000, price: 144.0 },
+        { id: "8105", title: "Telegram Members [VIP High Quality] (Price: ₹280.0/1k)", badge: "VIP", badgeColor: "#c0392b", desc: "Highest quality members with profile pictures and activity.", avgtime: "6 hours", min: 100, max: 5000, price: 280.0 }
+    ],
+    "telegram-engagement": [
+        { id: "8002", title: "Telegram Post Views [Last 10 Posts] (Price: ₹6.4/1k)", badge: "VIEWS", badgeColor: "#5dade2", desc: "Views on your last 10 posts instantly.\nSpeed: Ultra Fast", avgtime: "5 minutes", min: 1000, max: 500000, price: 6.4 },
+        { id: "8007", title: "Telegram Last Post Views (Price: ₹0.32/1k)", badge: "LAST POST", badgeColor: "#1abc9c", desc: "Get views only on your most recent post.", avgtime: "5 minutes", min: 100, max: 1000000, price: 0.32 },
+        { id: "8003", title: "Telegram Reactions [Random Positive] (Price: ₹9.6/1k)", badge: "REACTIONS", badgeColor: "#e74c3c", desc: "Adds random positive reactions (👍, 🔥, ❤️, etc.) to your post.", avgtime: "15 minutes", min: 100, max: 100000, price: 9.6 },
+        { id: "8201", title: "Telegram Reactions [Custom | e.g. ❤️] (Price: ₹12.0/1k)", badge: "CUSTOM", badgeColor: "#f39c12", desc: "You choose the specific emoji for the reaction.", avgtime: "20 minutes", min: 100, max: 100000, price: 12.0 },
+        { id: "8005", title: "Telegram Auto Views [30 Days] (Price: ₹1920.0/sub)", badge: "AUTO", badgeColor: "#9b59b6", desc: "Automatically get views on all new posts for 30 days.", avgtime: "Subscription", min: 1, max: 1, price: 1920.0 },
+        { id: "8006", title: "Telegram Poll Votes (Price: ₹64.0/1k)", badge: "POLL", badgeColor: "#34495e", desc: "Get votes on your Telegram polls.", avgtime: "1 hour", min: 100, max: 50000, price: 64.0 },
+        { id: "8202", title: "Telegram Comments/Replies (Price: ₹400.0/1k)", badge: "COMMENTS", badgeColor: "#2c3e50", desc: "Get comments or replies in your discussion group.", avgtime: "2 hours", min: 10, max: 1000, price: 400.0 }
+    ],
+    "youtube-views": [
+        { id: "5002", title: "YouTube Views [High Retention] (Price: ₹200.0/1k)", badge: "HQ VIEWS", badgeColor: "#d32f2f", desc: "Retention: 60-80%\nSpeed: 10k/Day\nMonetizable", avgtime: "6 hours", min: 1000, max: 1000000, price: 200.0 },
+        { id: "5101", title: "YouTube Views [⚡ Super Fast | Normal Retention] (Price: ₹96.0/1k)", badge: "FAST VIEWS", badgeColor: "#e64a19", desc: "Retention: 1-5 Mins\nSpeed: 100k/Day\nGood for ranking", avgtime: "1 hour", min: 1000, max: 5000000, price: 96.0 },
+        { id: "5102", title: "YouTube Views [🇮🇳 Indian Audience] (Price: ₹224.0/1k)", badge: "INDIAN", badgeColor: "#f57c00", desc: "Get views from an Indian audience.", avgtime: "12 hours", min: 1000, max: 100000, price: 224.0 },
+        { id: "5103", title: "YouTube Live Stream Views [30 Mins] (Price: ₹128.0/1k)", badge: "LIVE", badgeColor: "#c2185b", desc: "Concurrent viewers for your live stream for 30 minutes.", avgtime: "0-10 minutes", min: 100, max: 5000, price: 128.0 },
+        { id: "5104", title: "YouTube Shorts Views (Price: ₹64.0/1k)", badge: "SHORTS", badgeColor: "#ff3d00", desc: "Views specifically for your YouTube Shorts.", avgtime: "30 minutes", min: 1000, max: 2000000, price: 64.0 },
+        { id: "5105", title: "YouTube Adwords Views [Targeted] (Price: ₹640.0/1k)", badge: "ADWORDS", badgeColor: "#afb42b", desc: "Real views via Google Ads. 100% genuine.", avgtime: "24-48 hours", min: 5000, max: 100000, price: 640.0 },
+        { id: "5106", title: "YouTube Views [Slow & Steady | Organic] (Price: ₹192.0/1k)", badge: "DRIP", badgeColor: "#7b1fa2", desc: "Views delivered slowly over several days for a natural look.", avgtime: "1-3 days", min: 1000, max: 50000, price: 192.0 }
+    ],
+    "youtube-engagement": [
+        { id: "5001", title: "YouTube Subscribers [🔴 Non-Drop | Real] (Price: ₹768.0/1k)", badge: "YT-SUBS", badgeColor: "#e53935", desc: "Quality: Real Subscribers\nRefill: Lifetime Guarantee", avgtime: "24 hours", min: 100, max: 10000, price: 768.0 },
+        { id: "5003", title: "YouTube Watch Hours [🕒 4000 Hours Pack] (Price: ₹1152.0/pack)", badge: "WATCH TIME", badgeColor: "#c62828", desc: "Requirement: 1 Hour+ long video.\nHelps in monetization.", avgtime: "3-7 Days", min: 1, max: 1, price: 1152.0 },
+        { id: "5201", title: "YouTube Likes (Price: ₹160.0/1k)", badge: "LIKES", badgeColor: "#ff1744", desc: "Likes for your YouTube videos.", avgtime: "1 hour", min: 100, max: 10000, price: 160.0 },
+        { id: "5202", title: "YouTube Comments [Random Positive] (Price: ₹640.0/1k)", badge: "COMMENTS", badgeColor: "#d50000", desc: "Random positive comments in English.", avgtime: "3 hours", min: 10, max: 1000, price: 640.0 },
+        { id: "5203", title: "YouTube Dislikes (Price: ₹160.0/1k)", badge: "DISLIKES", badgeColor: "#a0a0a0", desc: "Dislikes for a specific YouTube video.", avgtime: "1 hour", min: 100, max: 10000, price: 160.0 },
+        { id: "5204", title: "YouTube Shares [Social Media] (Price: ₹320.0/1k)", badge: "SHARES", badgeColor: "#7b1fa2", desc: "Shares your video on various social media platforms.", avgtime: "24 hours", min: 100, max: 5000, price: 320.0 },
+        { id: "5205", title: "YouTube Favourites (Price: ₹128.0/1k)", badge: "FAVOURITES", badgeColor: "#5e35b1", desc: "Adds your video to users' favourite lists.", avgtime: "6 hours", min: 100, max: 10000, price: 128.0 }
+    ],
+    "facebook-services": [
+        { id: "6001", title: "Facebook Page Likes [👍 HQ Profiles] (Price: ₹192.0/1k)", badge: "PAGE LIKES", badgeColor: "#3b5998", desc: "Get likes on your Facebook page.\nQuality: High Quality Profiles", avgtime: "12 hours", min: 100, max: 50000, price: 192.0 },
+        { id: "6007", title: "Facebook Profile Followers (Price: ₹160.0/1k)", badge: "FOLLOWERS", badgeColor: "#1a77f2", desc: "Followers for your personal Facebook profile.", avgtime: "6 hours", min: 100, max: 10000, price: 160.0 },
+        { id: "6002", title: "Facebook Post Likes [⚡ Instant] (Price: ₹96.0/1k)", badge: "POST LIKES", badgeColor: "#4267B2", desc: "Get likes on your photos, videos, or posts.\nSpeed: Instant", avgtime: "30 minutes", min: 100, max: 20000, price: 96.0 },
+        { id: "6003", title: "Facebook Video Views (Price: ₹64.0/1k)", badge: "VIEWS", badgeColor: "#1877F2", desc: "Views for your Facebook videos.", avgtime: "1 hour", min: 1000, max: 1000000, price: 64.0 },
+        { id: "6004", title: "Facebook Group Members (Price: ₹224.0/1k)", badge: "MEMBERS", badgeColor: "#8a3ab9", desc: "Add members to your Facebook group.", avgtime: "24 hours", min: 200, max: 20000, price: 224.0 },
+        { id: "6005", title: "Facebook Comments [Random] (Price: ₹160.0/1k)", badge: "COMMENTS", badgeColor: "#365899", desc: "Random positive comments on your posts.", avgtime: "2 hours", min: 20, max: 1000, price: 160.0 },
+        { id: "6006", title: "Facebook Event Attendees (Price: ₹256.0/1k)", badge: "EVENT", badgeColor: "#f7b928", desc: "Get 'Interested' or 'Going' for your Facebook events.", avgtime: "6 hours", min: 100, max: 5000, price: 256.0 }
+    ],
+    "tiktok-services": [
+        { id: "9001", title: "TikTok Views (Price: ₹1.2/1k)", badge: "VIEWS", badgeColor: "#25F4EE", desc: "Speed: 1M/Day\nStart: Instant", avgtime: "5 minutes", min: 1000, max: 10000000, price: 1.2 },
+        { id: "9002", title: "TikTok Followers (Price: ₹192.0/1k)", badge: "FOLLOWERS", badgeColor: "#FF2C55", desc: "High-quality followers for your TikTok profile.", avgtime: "3 hours", min: 100, max: 100000, price: 192.0 },
+        { id: "9003", title: "TikTok Likes (Price: ₹128.0/1k)", badge: "LIKES", badgeColor: "#FE2C55", desc: "Likes for your TikTok videos.", avgtime: "1 hour", min: 100, max: 50000, price: 128.0 },
+        { id: "9004", title: "TikTok Shares (Price: ₹32.0/1k)", badge: "SHARES", badgeColor: "#000000", desc: "Shares for your videos to boost reach.", avgtime: "2 hours", min: 100, max: 100000, price: 32.0 },
+        { id: "9005", title: "TikTok Comments [Random] (Price: ₹320.0/1k)", badge: "COMMENTS", badgeColor: "#25F4EE", desc: "Random positive comments.", avgtime: "3 hours", min: 20, max: 1000, price: 320.0 },
+        { id: "9006", title: "TikTok Live Stream Views [30 Mins] (Price: ₹256.0/1k)", badge: "LIVE", badgeColor: "#ff2c55", desc: "Concurrent live stream viewers for 30 minutes.", avgtime: "0-5 minutes", min: 100, max: 5000, price: 256.0 },
+        { id: "9007", title: "TikTok Saves (Price: ₹64.0/1k)", badge: "SAVES", badgeColor: "#000000", desc: "Adds your video to users' favourite lists.", avgtime: "1 hour", min: 100, max: 50000, price: 64.0 }
+    ],
+    "twitter-x-services": [
+        { id: "10001", title: "Twitter (X) Followers (Price: ₹224.0/1k)", badge: "X-FOLLOW", badgeColor: "#1DA1F2", desc: "Followers for your Twitter (X) profile.", avgtime: "6 hours", min: 100, max: 20000, price: 224.0 },
+        { id: "10002", title: "Twitter (X) Likes (Price: ₹160.0/1k)", badge: "X-LIKES", badgeColor: "#1a91da", desc: "Likes for your tweets.", avgtime: "1 hour", min: 100, max: 10000, price: 160.0 },
+        { id: "10008", title: "Twitter (X) Retweets (Price: ₹200.0/1k)", badge: "X-RT", badgeColor: "#178fe6", desc: "Retweets for your posts.", avgtime: "1 hour", min: 100, max: 10000, price: 200.0 },
+        { id: "10009", title: "Twitter (X) Video Views (Price: ₹80.0/1k)", badge: "X-VIEWS", badgeColor: "#147ab8", desc: "Views for your videos on X.", avgtime: "30 minutes", min: 1000, max: 500000, price: 80.0 },
+        { id: "10010", title: "Twitter (X) Poll Votes (Price: ₹120.0/1k)", badge: "X-POLL", badgeColor: "#2795e9", desc: "Votes for your Twitter polls.", avgtime: "2 hours", min: 100, max: 20000, price: 120.0 },
+        { id: "10011", title: "Twitter (X) Comments (Price: ₹400.0/1k)", badge: "X-COMMENTS", badgeColor: "#105c9e", desc: "Random positive comments on your tweets.", avgtime: "4 hours", min: 20, max: 1000, price: 400.0 },
+        { id: "10012", title: "Twitter (X) Impressions (Price: ₹40.0/1k)", badge: "X-IMPRESS", badgeColor: "#0c3b62", desc: "Impressions to boost your tweet's visibility.", avgtime: "1 hour", min: 1000, max: 1000000, price: 40.0 }
+    ],
+    "other-platforms": [
+        { id: "10003", title: "Spotify Playlist Followers (Price: ₹192.0/1k)", badge: "SPOTIFY", badgeColor: "#1DB954", desc: "Followers for your Spotify playlist.", avgtime: "24 hours", min: 100, max: 50000, price: 192.0 },
+        { id: "10004", title: "Spotify Track Plays [USA] (Price: ₹96.0/1k)", badge: "PLAYS", badgeColor: "#1ed760", desc: "Plays for your track on Spotify from USA audience.", avgtime: "12 hours", min: 1000, max: 1000000, price: 96.0 },
+        { id: "10005", title: "Discord Members [Online] (Price: ₹960.0/1k)", badge: "DISCORD", badgeColor: "#5865F2", desc: "Members that appear online for your Discord server.", avgtime: "6-12 hours", min: 100, max: 5000, price: 960.0 },
+        { id: "10007", title: "SoundCloud Plays (Price: ₹32.0/1k)", badge: "SOUNDCLOUD", badgeColor: "#ff5500", desc: "Plays for your track on SoundCloud.", avgtime: "3 hours", min: 1000, max: 500000, price: 32.0 },
+        { id: "11001", title: "LinkedIn Company Followers (Price: ₹800.0/1k)", badge: "LINKEDIN", badgeColor: "#0A66C2", desc: "Followers for your LinkedIn Company Page.", avgtime: "24-48 hours", min: 100, max: 10000, price: 800.0 },
+        { id: "11002", title: "Pinterest Followers (Price: ₹320.0/1k)", badge: "PINTEREST", badgeColor: "#E60023", desc: "Followers for your Pinterest profile.", avgtime: "12 hours", min: 100, max: 10000, price: 320.0 },
+        { id: "10006", "title": "Website Traffic [Worldwide] (Price: ₹64.0/1k)", "badge": "TRAFFIC", "badgeColor": "#ff6f00", "desc": "Get 1,000 visitors to your website from worldwide sources.", "avgtime": "24 hours", "min": 1000, "max": 1000000, "price": 64.0 },
+    ]
 };
+
 const primaryColor = "#1b365d";
 const secondaryColor = "#2474df";
 const accentColor = "#36c2ff";
