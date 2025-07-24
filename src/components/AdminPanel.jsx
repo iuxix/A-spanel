@@ -54,18 +54,21 @@ export default function AdminPanel() {
   }
 
   async function rejectPayment(payment) {
+    // Rejection is not shown to user per your instruction,
+    // but admin can delete requests which are not accepted
+
     setActionMsg(""); setLoading(true);
     try {
       await deleteDoc(doc(db, "payments", payment.id));
       await addDoc(collection(db, "history"), {
-        type: "payment_reject",
+        type: "payment_delete",
         user: payment.user,
-        description: `Rejected fund ₹${payment.amount} from ${payment.username || payment.user}`,
+        description: `Deleted fund request ₹${payment.amount} from ${payment.username || payment.user}`,
         timestamp: Date.now()
       });
-      setActionMsg(`❌ Rejected ₹${payment.amount} from ${payment.username || payment.user}`);
+      setActionMsg(`❌ Deleted ₹${payment.amount} fund request from ${payment.username || payment.user}`);
     } catch (err) {
-      setActionMsg("❌ Error rejecting payment: " + err.message);
+      setActionMsg("❌ Error deleting fund request: " + err.message);
     }
     setLoading(false);
   }
@@ -120,7 +123,7 @@ export default function AdminPanel() {
                       Accept
                     </button>
                     <button onClick={() => rejectPayment(p)} disabled={loading} style={btnReject}>
-                      Reject
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -135,7 +138,7 @@ export default function AdminPanel() {
           fontWeight: 800, fontSize: "1.35em", marginBottom: 14,
           borderBottom: `2px solid ${accentColor}`, paddingBottom: 4
         }}>
-          Action History (Cleared after 24 hours)
+          Action History (Auto-cleared after 24 hours)
         </h2>
         {userHistory.length === 0 ? (
           <p style={{ color: "#666", fontStyle: "italic" }}>No action history available.</p>
@@ -150,7 +153,7 @@ export default function AdminPanel() {
           </div>
         )}
         <p style={{ fontSize: "0.85em", fontStyle: "italic", marginTop: 12, color: "#888" }}>
-          Note: History is stored temporarily and cleared automatically after 24 hours.
+          Note: History is stored temporarily and automatically cleared after 24 hours.
         </p>
       </section>
     </div>
